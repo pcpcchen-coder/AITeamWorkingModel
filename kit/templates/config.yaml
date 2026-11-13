@@ -1,0 +1,35 @@
+# .aiteam/config.yaml — 專案設定（樣板；所有帳號為虛構範例）
+# 人類專屬檔案：Agent 身份不可修改（見 docs/11 §5.1）
+project: example-project
+forge: github            # github | none
+default_branch: main
+
+people:
+  - handle: primary-a    # forge 帳號
+    roles: [primary]
+    domains: [hw, fw]    # 擔任 owner 的領域
+    qualifications: []   # 可執行的人類任務類別，例：bench_low_voltage
+  - handle: backup-b
+    roles: [backup]
+    domains: [sw]
+  - handle: reviewer-c
+    roles: [reviewer]
+    domains: [hw, fw]
+    qualifications: [bench_low_voltage]
+
+agents:
+  identities: [aiteam-bot]   # 這些身份的核准一律不計
+
+packs: [sw, fw, hw]
+
+wip:                         # 試行假設，依指標調整
+  max_in_review_per_person: 3
+  max_open_decisions: 5
+  max_rework: 3
+
+decision_sla_workdays: {G1: 2, G2: 3}
+
+cadence:
+  weekly_sync: "Mon 10:00"
+  digest_day: Fri
+  takeover_drill: monthly

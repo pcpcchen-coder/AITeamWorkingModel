@@ -1,6 +1,6 @@
 # AI Team Working Model — AI-Driven R&D
 
-> **Status:** Architecture & operating-model proposal (v0.2, 2026-11-13). This repository is **not** a deployed AI platform.
+> **Status:** Architecture & operating-model proposal (v0.3, 2026-11-13). This repository is **not** a deployed AI platform；v0.3 規劃的 `aitw` 工具尚未實作。
 >
 > **Language:** 繁體中文為主；code / API / schema 保留英文名稱。
 >
@@ -49,11 +49,28 @@ Human Backup ── challenges / takeover┘             │
 | [06 導入路線圖與 KPI](docs/06-rollout-and-kpi.md) | 90 天分階段導入、驗收標準 |
 | [07 工程實作 Backlog](docs/07-engineering-backlog.md) | 可交給 Claude Code / Codex 的任務拆解 |
 | [08 討論整合與決策](docs/08-decision-log.md) | 原始問題 → 目標模式、ADR 草案、待確認條件 |
+| [09 執行流程 Playbook](docs/09-execution-playbook.md) | **v0.3** 九步流程、共讀協定、共推協定、節奏、RACI、手動模式 |
+| [10 軟／韌／硬領域規範](docs/10-domain-profiles-sw-fw-hw.md) | **v0.3** 各領域的 AI 自主度、驗證階梯、證據、Gate、介面契約、人類任務 |
+| [11 輔助工具規格](docs/11-toolkit-spec.md) | **v0.3** Git-native Operating Kit：檔案契約、`aitw` CLI、Gate、Agent／Forge 整合、看板 |
+| [12 操作範例](docs/12-operating-examples.md) | **v0.3** 一個橫跨軟韌硬的虛構 Mission 從頭走到尾 |
+| [13 開發交付包](docs/13-opus-handoff.md) | **v0.3** 實作工單 K0–K8、不變量、啟動指令、待確認事項 |
+| [Kit 樣板與檢查表](kit/README.md) | 現在就能用的手動模式樣板 |
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
 | [互動 Demo](demo/mission-control.html) | 單檔 HTML、模擬資料、離線可用 |
 
-## MVP 優先交付
+## v0.3：先讓流程能操作（Git-native Operating Kit）
+
+01–08 定義原則與目標平台；v0.3 補上「明天就能照做」的一層——**流程先以版控檔案 + PR + CI + CLI 運作，Mission Control 平台之後只是讀同一份資料的檢視層。**
+
+- **檔案是狀態、PR 是共讀面、CI 是關卡**；人類在 forge 上的已驗證行為是核准正本。
+- **AI 不能自己把結果標成 VERIFIED**；只有 CI 重跑或人類依原始資料簽認可以。
+- **軟／韌／硬採不同的自主度與驗證階梯**；燒錄、上電、量測、送板一律由人執行，AI 準備與分析。
+- **共推進度**：決策佇列與時限、人類任務接力、方向指示、WIP 上限保護人類注意力。
+
+從 [09](docs/09-execution-playbook.md) 開始讀；想直接看實例讀 [12](docs/12-operating-examples.md)。實作優先序調整見 [07](docs/07-engineering-backlog.md) 開頭與 [13](docs/13-opus-handoff.md)。
+
+## MVP 優先交付（平台層，v0.2 規劃）
 
 1. **事件擷取：** Git / PR / Issue / CI / 實驗 manifest → 有來源的事件庫。
 2. **AI 工作摘要：** 自動歸納「完成、進行中、風險、待決策」，標示證據／未知。
@@ -77,10 +94,11 @@ Human Backup ── challenges / takeover┘             │
 1. 先讀 [01 願景與角色制度](docs/01-operating-model.md) 和 [02 工作流程](docs/02-workflow-and-takeover.md)。
 2. 直接用瀏覽器開啟 [離線 Demo](demo/mission-control.html)，體驗共讀、任務審核與接手。
 3. 依 [90 天導入計畫](docs/06-rollout-and-kpi.md) 選 2–3 個不同性質的試點。
-4. 交給 AI Coding Agent 前，先讓它閱讀 [AGENTS.md](AGENTS.md) 和 [工程 Backlog](docs/07-engineering-backlog.md)。
+4. 交給 AI Coding Agent 前，先讓它閱讀 [AGENTS.md](AGENTS.md) 和 [開發交付包](docs/13-opus-handoff.md)（Operating Kit 工單）；平台層工單見 [工程 Backlog](docs/07-engineering-backlog.md)。
+5. 不等工具：依 [kit/README.md](kit/README.md) 的手動模式，用樣板先跑一輪。
 
 **邊界：** 第一階段 AI 僅能在可控的資料、程式與沙盒環境中執行。正式設備控制、正式部署、具安全影響的研究結論與重要技術決策均需要人類核准。
 
 ## 版本與來源
 
-本版是 2026-11-13 前的設計討論整理：從「單人專案 → Primary/Backup」延伸至「AI Shadow → AI-Driven R&D + Human Co-Review」。文內時間、投入比例與成功目標都是**試行假設**，不是部署現況或已驗證績效。
+本版是 2026-11-13 前的設計討論整理：從「單人專案 → Primary/Backup」延伸至「AI Shadow → AI-Driven R&D + Human Co-Review」，v0.3 再加入可操作的執行流程、軟韌硬領域規範與輔助工具規格。文內時間、投入比例與成功目標都是**試行假設**，不是部署現況或已驗證績效。
