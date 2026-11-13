@@ -1,6 +1,6 @@
 # AI Team Working Model — AI-Driven R&D
 
-> **Status:** Architecture & operating-model proposal (v0.3, 2026-11-13). This repository is **not** a deployed AI platform；v0.3 規劃的 `aitw` 工具尚未實作。
+> **Status:** Architecture & operating-model proposal (v0.4, 2026-11-13). This repository is **not** a deployed AI platform；v0.3 規劃的 `aitw` 工具尚未實作。
 >
 > **Language:** 繁體中文為主；code / API / schema 保留英文名稱。
 >
@@ -54,10 +54,12 @@ Human Backup ── challenges / takeover┘             │
 | [11 輔助工具規格](docs/11-toolkit-spec.md) | **v0.3** Git-native Operating Kit：檔案契約、`aitw` CLI、Gate、Agent／Forge 整合、看板 |
 | [12 操作範例](docs/12-operating-examples.md) | **v0.3** 一個橫跨軟韌硬的虛構 Mission 從頭走到尾 |
 | [13 開發交付包](docs/13-opus-handoff.md) | **v0.3** 實作工單 K0–K8、不變量、啟動指令、待確認事項 |
+| [14 GitLab 執行方式](docs/14-gitlab-profile.md) | **v0.4** AI 開發 × GitLab 共同 review：平台對照、依授權等級的強制方式、漸進導入階梯 |
 | [Kit 樣板與檢查表](kit/README.md) | 現在就能用的手動模式樣板 |
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
-| [互動 Demo](demo/mission-control.html) | 單檔 HTML、模擬資料、離線可用 |
+| [互動 Demo：Mission Control](demo/mission-control.html) | 單檔 HTML、模擬資料、離線可用 |
+| [互動 Demo：工作流程案例示範](demo/workflow-walkthrough.html) | **v0.4** 一步步播放虛構案例：三方接力、看板變化、Gate 模擬器；可切換 GitLab／GitHub 用語 |
 
 ## v0.3：先讓流程能操作（Git-native Operating Kit）
 
@@ -68,7 +70,9 @@ Human Backup ── challenges / takeover┘             │
 - **軟／韌／硬採不同的自主度與驗證階梯**；燒錄、上電、量測、送板一律由人執行，AI 準備與分析。
 - **共推進度**：決策佇列與時限、人類任務接力、方向指示、WIP 上限保護人類注意力。
 
-從 [09](docs/09-execution-playbook.md) 開始讀；想直接看實例讀 [12](docs/12-operating-examples.md)。實作優先序調整見 [07](docs/07-engineering-backlog.md) 開頭與 [13](docs/13-opus-handoff.md)。
+- **GitLab 與 GitHub 皆可**：單位既有的「AI 開發、GitLab 上 review」案例是首個試點候選，可從 MR 樣板開始漸進導入（[14](docs/14-gitlab-profile.md)）。
+
+從 [09](docs/09-execution-playbook.md) 開始讀；想直接看實例讀 [12](docs/12-operating-examples.md) 或開啟 [工作流程案例示範](demo/workflow-walkthrough.html)。實作優先序調整見 [07](docs/07-engineering-backlog.md) 開頭與 [13](docs/13-opus-handoff.md)。
 
 ## MVP 優先交付（平台層，v0.2 規劃）
 

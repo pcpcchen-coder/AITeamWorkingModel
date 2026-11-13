@@ -17,6 +17,8 @@
 3. AI 依 `templates/review-packet.md` 產生共讀包；人類依「必看清單」審查並以 PR review 決定。
 4. 主幹開啟分支保護：必須經 PR、必須有人類核准、新 commit 使舊核准失效。
 
+**GitLab 專案：** 把 [`.github/pull_request_template.md`](../.github/pull_request_template.md) 的內容複製為 `.gitlab/merge_request_templates/Default.md`，並建立四個看板 label（等我決定、等我動手、AI 進行中、卡住）。平台對照與各授權等級可強制的範圍見 [docs/14](../docs/14-gitlab-profile.md)。
+
 手動模式缺少自動強制（Gate、證據過期、WIP 上限）——這是工具要補的。
 
 ## 注意

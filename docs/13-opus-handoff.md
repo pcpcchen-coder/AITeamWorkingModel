@@ -10,8 +10,9 @@
 
 1. [`AGENTS.md`](../AGENTS.md)（共同規範，全部適用）
 2. [09 執行流程](09-execution-playbook.md) → [10 領域規範](10-domain-profiles-sw-fw-hw.md) → [11 工具規格](11-toolkit-spec.md)（**主要規格**）→ [12 操作範例](12-operating-examples.md)（**端對端驗收情境**）
-3. [`kit/templates/`](../kit/templates/)、[`kit/checklists/`](../kit/checklists/)（檔案契約的起點）
-4. 01–08 為背景；與 09–13 衝突時以 09–13 為準，並在 PR 指出衝突處。
+3. [14 GitLab 執行方式](14-gitlab-profile.md)（單位實際使用的平台；K2b 的規格）
+4. [`kit/templates/`](../kit/templates/)、[`kit/checklists/`](../kit/checklists/)（檔案契約的起點）
+5. 01–08 為背景；與 09–14 衝突時以 09–14 為準，並在 PR 指出衝突處。
 
 ### 1.2 不可違反的不變量
 
@@ -36,7 +37,7 @@
 - 相依最小化：YAML 解析、JSON Schema 驗證、指令列框架各一個成熟函式庫即可；新增其他相依需在 PR 說明必要性（AGENTS.md 規則 9）。
 - 單元測試不得連網；forge 互動一律經 `ForgeAdapter`，測試使用 `FakeForge`。
 - 使用者可見訊息與文件用繁體中文；程式、欄位名、指令用英文。
-- Claude Code 與 GitHub 的功能、檔案格式、設定名稱**先查官方文件再實作**；與本規格描述不符時以官方為準並回報。
+- Claude Code、GitHub 與 GitLab 的功能、檔案格式、設定名稱**先查官方文件再實作**；與本規格描述不符時以官方為準並回報。
 - 範例專案只用主機端工具鏈可建置的內容（例：以主機編譯器建置的 C 測試、Python 腳本）；不要求模擬器或 EDA 軟體即可跑通 CI。需要外部工具的驗證配方標為「選用」。
 
 ### 1.4 工作方式（本專案即第一個試點）
@@ -55,11 +56,11 @@ Mission 檔：[`work/missions/M-001-build-operating-kit/mission.md`](../work/mis
 
 | 里程碑 | 包含工單 | 人類可以做到什麼 |
 |---|---|---|
-| **M1 可操作** | K0–K3 | 用指令建立 WP、留證、產生共讀包、過 Gate、看看板（Agent 部分仍用一般提示） |
+| **M1 可操作** | K0、K1、K2a、K2b、K3 | 用指令建立 WP、留證、產生共讀包、過 Gate、看看板（Agent 部分仍用一般提示） |
 | **M2 可交給 AI** | K4–K5 | 用技能驅動 Agent；韌體／硬體領域包與人類任務可用 |
 | **M3 可持續** | K6–K8 | 週摘要、會議議程、指標、接手演練、完整教學 |
 
-相依：`K0 → K1 → K2 → K3`；K4 與 K5 在 K3 之後可平行；K6、K7 在 K3 之後；K8 最後。
+相依：`K0 → K1 → K2a → K3`；**K2b（GitLab）在 K2a 之後，可與 K3 平行，須在首個 GitLab 試點前完成**；K4 與 K5 在 K3 之後可平行；K6、K7 在 K3 之後；K8 最後。
 
 ## 3. 工單
 
@@ -97,7 +98,7 @@ Mission 檔：[`work/missions/M-001-build-operating-kit/mission.md`](../work/mis
 
 **人類必看：** 證據執行器的實作（指令執行、限時、輸出保存）；標籤規則測試。
 
-### K2 — Gate、CI 驗證與 GitHub 整合　·　G2　·　規模 L
+### K2a — Gate 核心、CI 驗證與 GitHub 整合　·　G2　·　規模 L
 
 **範圍：** `verify`、`gate check`（11 §5.3 全部 14 步）、`decision request|list|resolve`、`doctor`、`ForgeAdapter` 與 `GitHubForge`／`FakeForge`、`kit/forge/github/`（workflow、CODEOWNERS 產生、設定指南）。
 
@@ -110,6 +111,22 @@ Mission 檔：[`work/missions/M-001-build-operating-kit/mission.md`](../work/mis
 - `GitHubForge` 以錄製的回應做契約測試；真實 API 的手動驗證步驟寫入文件。
 
 **人類必看：** Gate 演算法實作全文；workflow 的觸發條件與權限；安全案例測試清單。
+
+### K2b — GitLab adapter 與整合包　·　G2　·　規模 M
+
+**目標：** 讓 Kit 在單位實際使用的 GitLab 上運作（規格見 [14](14-gitlab-profile.md)）。
+
+**範圍：** `GitLabForge`；`kit/forge/gitlab/`（CI 範本含 `aitw-verify`、`aitw-gate` job、MR 樣板、設定指南）；`doctor` 的 GitLab 檢查項；可設定的留言指令前綴；Free 與 Premium 兩種強制方式的設定指南。
+
+**驗收：**
+- K2a 的全部 Gate 案例（含安全案例）以 GitLab 形式的固定資料再跑一次並通過——同一組案例、兩個 adapter。
+- Free 版情境：平台核准為選用時，未達核准條件 Gate 仍失敗；bot 與 MR 作者的核准不計；早於最新版本的核准不計。
+- 以 `aitw:` 前綴的留言指令可被辨識；GitLab 原生 quick action 不被誤判為 Kit 指令。
+- `doctor` 能指出：主幹未保護、未開啟「Pipelines must succeed」、CI 設定檔仍在專案內（AI 可改）、bot 角色過高。
+- 14 §5 的六個要點各有測試或文件化的人工驗證步驟（後者標示 NOT AUTOMATED）；14 列為 UNKNOWN 的項目需以實際 GitLab 驗證並回寫文件。
+- 「核准後重新評估 Gate」的作法經實測選定，並在 PR 以決策請求說明取捨。
+
+**人類必看：** CI 範本的 job 定義與變數使用；設定指南（需對照單位的 GitLab 版本與等級）。
 
 ### K3 — 共讀包、狀態與看板　·　G1　·　規模 M
 
@@ -163,7 +180,7 @@ Mission 檔：[`work/missions/M-001-build-operating-kit/mission.md`](../work/mis
 
 ### K8 — 黃金路徑端對端與教學　·　G1　·　規模 M
 
-**範圍：** 把 12 的全流程寫成可重跑的端對端測試（FakeForge）；`docs/14-quickstart.md`（從 `aitw init` 到第一個 WP 合併）；核對 09–12 與實作的差異並同步。
+**範圍：** 把 12 的全流程寫成可重跑的端對端測試（FakeForge）；`docs/15-quickstart.md`（從 `aitw init` 到第一個 WP 合併，含 GitHub 與 GitLab 兩版步驟）；核對 09–14 與實作的差異並同步。
 
 **驗收：** 端對端測試在 CI 離線通過，涵蓋 12 的 §5–§8 與 §12 的每個例外情境；一位未參與開發的人依 quickstart 可在範例專案完成一輪（人工驗證，結果寫入 PR）。
 
@@ -183,7 +200,7 @@ Mission 檔：[`work/missions/M-001-build-operating-kit/mission.md`](../work/mis
 你要在 AITeamWorkingModel repo 實作「Git-native Operating Kit」。
 
 先讀：AGENTS.md → docs/09 → docs/10 → docs/11（主要規格）→ docs/12（端對端情境）
-→ docs/13（工單與不變量）→ kit/templates/、kit/checklists/。
+→ docs/13（工單與不變量）→ docs/14（GitLab）→ kit/templates/、kit/checklists/。
 
 規則：
 1. 依 docs/13 的工單順序進行，從 K0 開始；一張工單一個（或更小的）PR，
@@ -193,7 +210,7 @@ Mission 檔：[`work/missions/M-001-build-operating-kit/mission.md`](../work/mis
 3. 每個 PR 依 .github/pull_request_template.md 附共讀包：主張表（含標籤）、
    必看清單、未驗證範圍、實際執行的指令與輸出。沒執行過的測試不得說通過。
 4. docs/13 §1.2 的不變量 I1–I10 每條都要有測試，不可為了方便而放寬。
-5. 規格不清、有誤、或與官方文件（Claude Code、GitHub）不符時：不要默默偏離；
+5. 規格不清、有誤、或與官方文件（Claude Code、GitHub、GitLab）不符時：不要默默偏離；
    在 PR 以決策請求列出選項與建議，先做不相依的部分。
 6. 不擴大範圍；額外想法寫入「後續建議」。
 7. 所有範例資料必須虛構並標示；不可加入 secret 或真實研發資料。
@@ -207,13 +224,13 @@ Mission 檔：[`work/missions/M-001-build-operating-kit/mission.md`](../work/mis
 
 | # | 問題 | 目前預設 | 影響 | 最晚需決定 |
 |---|---|---|---|---|
-| D1 | Forge 平台：GitHub，或單位內部的 Git 平台？ | GitHub | 另一平台需新增 adapter 與 CI 設定 | K2 前 |
-| D2 | Agent 用什麼身份發 PR？ | 獨立機器身份 | 若 Agent 以你的帳號發 PR，你無法在 forge 上「核准」自己的 PR，Gate 的人類核准將無法成立 | K2 前 |
-| D3 | 目前的人力：只有你（Solo），或已有 Backup／Reviewer？ | 先以 Solo 設計可運作，Pair 為目標 | WIP 上限、G3 的兩人要求、共讀流程 | K3 前 |
+| D1 | Forge 平台 | **已確認：單位使用 GitLab**；本 repo 留在 GitHub。兩個 adapter 都做（K2a、K2b） | 尚需確認 GitLab 為自架或雲端、版本與授權等級（Free 不能由平台強制核准，見 14 §4） | K2b 前 |
+| D2 | Agent 用什麼身份發 PR／MR？ | 獨立機器身份（GitLab：project access token 的 bot 或 service account） | 若 Agent 以人的帳號提交，該人的核准不應計入，Gate 的人類核准將無法成立 | K2a 前 |
+| D3 | 目前的人力配置 | 單位案例已有多人在 GitLab 上 review → 以 Pair／Team 為主要情境；Solo 仍可運作 | WIP 上限、G3 的兩人要求、共讀流程 | K3 前 |
 | D4 | 硬體設計使用哪種 EDA？檔案是否為文字格式、可否匯出網表／BOM？ | 未知；領域包先以「匯出檔進版控」設計 | 硬體領域包的驗證配方與圖像差異 | K5 前 |
 | D5 | 韌體的目標平台與工具鏈？是否已有主機端測試或模擬器？ | 未知；工具鏈中立，範例只用主機端 | 韌體領域包的驗證配方 | K5 前 |
 | D6 | 真實專案放在哪？（本 repo 為公開） | Kit 在本 repo 開發；真實專案用私有 repo 並以 `aitw init` 安裝 | 資料分級、看板發佈方式 | 首個真實試點前 |
-| D7 | 第一個真實試點要選哪個題目？ | 建議先選純軟體或韌體主機端題目，再擴到含實體量測者 | 驗證 12 的假設 | M1 完成時 |
+| D7 | 第一個真實試點要選哪個題目？ | **建議以單位既有的 GitLab 案例為首個試點**，從 14 §6 的第 1 級（MR 樣板與看板 label）開始，不必等工具 | 驗證 12 的假設；訪談清單見 14 §8 | 現在即可開始 |
 | D8 | Agent 執行環境除 Claude Code 外，是否需同時支援本地模型？ | 先 Claude Code；契約保持中立 | K4 範圍 | K4 前 |
 
 ## 7. 已知風險（規劃者的提醒）

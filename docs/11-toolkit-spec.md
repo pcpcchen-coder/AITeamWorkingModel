@@ -13,7 +13,7 @@
 | 確定性骨幹 | CLI 不呼叫 LLM；同樣輸入得到同樣輸出。LLM 只在 Agent 層產生文字，且不是事實來源 |
 | 檔案即資料庫 | 所有狀態是 repo 內的 YAML／Markdown，可 diff、可審、可搬到任何 Git 平台 |
 | 強制在伺服端 | 真正的關卡是 forge 分支保護 + CI 檢查，不是 Agent 的自律或前端顯示 |
-| 可替換 | Forge（GitHub 先）、Agent 執行環境（Claude Code 先）、領域包都以薄介面隔開 |
+| 可替換 | Forge（GitHub 與 GitLab）、Agent 執行環境（Claude Code 先）、領域包都以薄介面隔開 |
 | 離線可測 | 單元測試不需網路；forge 以假實作替身測試 |
 
 **非目標（MVP 不做）：** 後端服務與資料庫、即時多人編輯、CLI 內建模型推論、設備或儀器控制、G0 自動合併、取代機構的 PLM／ELN／安全 SOP。
@@ -46,7 +46,7 @@
 | ② | 檔案契約 | JSON Schema + 樣板 | `packages/aitw/schemas/`、`kit/templates/` |
 | ③ | 領域包 | YAML + Markdown | `kit/packs/{sw,fw,hw}/`、`kit/checklists/` |
 | ④ | Agent 整合包 | 技能、子代理、hook 設定 | `kit/agent/claude-code/` |
-| ⑤ | Forge 整合包 | workflow、PR 樣板、設定指南 | `kit/forge/github/` |
+| ⑤ | Forge 整合包 | CI 範本、PR／MR 樣板、設定指南 | `kit/forge/github/`、`kit/forge/gitlab/` |
 | ⑥ | 看板 | 靜態 HTML + JSON | 由 `aitw board build` 產生 |
 | ⑦ | 範例專案 | 虛構、可在 CI 跑通 | `examples/bms-ntc-demo/` |
 
@@ -231,7 +231,7 @@ ForgeAdapter（介面）
   get_check_runs(sha)  -> [{name, conclusion, run_id}]
   identity_kind(user)  -> human | bot
   branch_protection(ref) -> {...}
-實作：GitHubForge（REST）、LocalForge（僅 git，無核准資訊）、FakeForge（測試用，讀固定資料）
+實作：GitHubForge（REST）、GitLabForge（REST；PR 對應 MR，見 14）、LocalForge（僅 git，無核准資訊）、FakeForge（測試用，讀固定資料）
 ```
 
 ## 8. Agent 整合包（Claude Code 先行）
@@ -279,7 +279,9 @@ Agent 的行為契約沿用 [`prompts/agent-contracts.md`](../prompts/agent-cont
 
 **Hook 是輔助防線，不是安全邊界。** 真正的保證來自：Agent 的執行環境根本沒有燒錄器與儀器的存取權、Agent 身份沒有合併與核准權限、CI Gate 取自基底分支。
 
-## 9. Forge 整合包（GitHub 先行）
+## 9. Forge 整合包（GitHub 與 GitLab）
+
+本節以 GitHub 為例說明；**GitLab 的對照、依授權等級的強制方式與實作要點見 [14](14-gitlab-profile.md)**。兩個平台共用同一組 Gate 測試案例。全文的「PR」在 GitLab 上讀作「MR」。
 
 ### 9.1 必要設定（`aitw doctor` 檢查；名稱以 GitHub 官方文件為準）
 
@@ -299,7 +301,7 @@ Agent 的行為契約沿用 [`prompts/agent-contracts.md`](../prompts/agent-cont
 
 ### 9.3 人類留言指令（Gate 以 API 回查，MVP 不需寫入型機器人）
 
-`/read` · `/understood <答案>` · `/decide DR-NNN <選項> [理由]` · `/steer <內容>` · `/time <分鐘>`。只有 config 內登錄的人類身份有效。
+`/read` · `/understood <答案>` · `/decide DR-NNN <選項> [理由]` · `/steer <內容>` · `/time <分鐘>`。只有 config 內登錄的人類身份有效。指令前綴可設定：GitLab 上 `/` 開頭會與 quick actions 衝突，預設改用 `aitw:`（例：`aitw: decide DR-001 A`）。
 
 ### 9.4 PR 樣板
 
@@ -342,7 +344,7 @@ PR 說明採共讀包的精簡版（見 [`.github/pull_request_template.md`](../
 
 | T 系列 | 在 Kit 中的對應 | 說明 |
 |---|---|---|
-| T04 狀態機與核准關卡 | K1、K2 | 以檔案 + forge 實現，不需資料庫 |
+| T04 狀態機與核准關卡 | K1、K2a、K2b | 以檔案 + forge 實現，不需資料庫 |
 | T05 Co-Review UI | K3（共讀包 + PR + 看板） | PR 即共讀面 |
 | T06 Backup 週摘要 | K6 | |
 | T07、T08 接手包與演練 | K7 | |
