@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- 離線可用的虛構流程示範。內容與 docs/12 對應；不連接任何真實系統、模型或設備。 -->
+</head>
+<body>
+<title>共讀共推流程示範</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a relay track on top (three lanes, thirteen stations); below it the scene of the
+   current station beside the live board; then a gate bench and a domain ladder. */
+:root{
+  --bg:#f3f5f8; --surface:#fbfcfd; --sunk:#e9edf2; --ink:#16202e; --muted:#566475; --line:#d3dae3;
+  --accent:#1b3a63; --on-accent:#f6f9fc;
+  --human:#9a5a08; --human-bg:#fcefd9; --ai:#1c58b3; --ai-bg:#e1ebfa; --ci:#1a7046; --ci-bg:#dcf2e5;
+  --bad:#ad3226; --bad-bg:#fbe5e1; --hyp:#7a5a00; --hyp-bg:#fbf1c9;
+  --term-bg:#13202f; --term-fg:#dbe6f2; --term-dim:#8ea3b9; --term-ok:#7fdba6; --term-bad:#ff9d8f;
+  --f-display:"Space Grotesk","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e141c; --surface:#17202b; --sunk:#101821; --ink:#e5ebf2; --muted:#9aa8b8; --line:#2a3644;
+  --accent:#9cc3f5; --on-accent:#0e1a2a;
+  --human:#f1b660; --human-bg:#3a2a10; --ai:#86b4ff; --ai-bg:#152a4b; --ci:#74d3a0; --ci-bg:#11331f;
+  --bad:#ff9384; --bad-bg:#3e1915; --hyp:#f0cf6a; --hyp-bg:#3a3010;
+  --term-bg:#0a1119; --term-fg:#d6e2ef; --term-dim:#7f93a8; --term-ok:#7fdba6; --term-bad:#ff9d8f;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0e141c; --surface:#17202b; --sunk:#101821; --ink:#e5ebf2; --muted:#9aa8b8; --line:#2a3644;
+  --accent:#9cc3f5; --on-accent:#0e1a2a;
+  --human:#f1b660; --human-bg:#3a2a10; --ai:#86b4ff; --ai-bg:#152a4b; --ci:#74d3a0; --ci-bg:#11331f;
+  --bad:#ff9384; --bad-bg:#3e1915; --hyp:#f0cf6a; --hyp-bg:#3a3010;
+  --term-bg:#0a1119; --term-fg:#d6e2ef; --term-dim:#7f93a8; --term-ok:#7fdba6; --term-bad:#ff9d8f;
+  color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.25}
+h1{font-size:30px;font-weight:700;letter-spacing:.01em}
+h2{font-size:20px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+p{margin:0}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-size:.92em}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+/* header */
+.head{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;justify-content:space-between}
+.head .lede{max-width:62ch;color:var(--muted);margin-top:6px}
+.note{display:inline-block;font-size:12.5px;padding:3px 9px;border:1px dashed var(--line);border-radius:4px;color:var(--muted);margin-top:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:7px 14px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.forge-note{font-size:12.5px;color:var(--muted);margin-top:6px;max-width:38ch}
+
+/* lane chips */
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.chip.h{background:var(--human-bg);color:var(--human)} .chip.a{background:var(--ai-bg);color:var(--ai)} .chip.c{background:var(--ci-bg);color:var(--ci)}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:3px;border:1px solid currentColor;white-space:nowrap}
+.tag.VERIFIED{color:var(--ci)} .tag.OBSERVED{color:var(--ai)} .tag.HYPOTHESIS,.tag.RECOMMENDATION{color:var(--hyp)} .tag.UNKNOWN{color:var(--bad)}
+
+/* track */
+.track-box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 0 12px}
+.track-scroll{overflow-x:auto;padding:0 16px}
+.track{position:relative;display:grid;grid-template-columns:76px repeat(13,minmax(58px,1fr));grid-template-rows:repeat(3,58px);min-width:860px}
+.lane-label{grid-column:1;display:flex;align-items:center;font-size:13px;font-weight:700}
+.lane-label.h{color:var(--human)} .lane-label.a{color:var(--ai)} .lane-label.c{color:var(--ci)}
+.lane-bg{grid-column:2 / -1;border-top:1px dashed var(--line)}
+.lane-bg.first{border-top:0}
+.track svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.track svg path{fill:none;stroke:var(--line);stroke-width:2}
+.track svg path.done{stroke:var(--muted)}
+.st{position:relative;z-index:1;place-self:center;width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--surface);font-family:var(--f-mono);font-weight:600;font-size:13.5px;color:var(--muted);transition:transform .2s,box-shadow .2s}
+.st.h.done{border-color:var(--human);color:var(--human);background:var(--human-bg)}
+.st.a.done{border-color:var(--ai);color:var(--ai);background:var(--ai-bg)}
+.st.c.done{border-color:var(--ci);color:var(--ci);background:var(--ci-bg)}
+.st.cur{transform:scale(1.22);color:var(--on-accent)}
+.st.h.cur{background:var(--human);border-color:var(--human);box-shadow:0 0 0 5px var(--human-bg)}
+.st.a.cur{background:var(--ai);border-color:var(--ai);box-shadow:0 0 0 5px var(--ai-bg)}
+.st.c.cur{background:var(--ci);border-color:var(--ci);box-shadow:0 0 0 5px var(--ci-bg)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px 0}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 14px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.counter{font-family:var(--f-mono);font-size:13px;color:var(--muted);margin-left:auto}
+
+/* stage */
+.stage{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.step-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:6px}
+.step-head h2{flex:1 1 260px}
+.story{max-width:64ch;margin-bottom:6px}
+.toolline{font-size:13px;color:var(--muted);margin-bottom:14px}
+.blocks{display:flex;flex-direction:column;gap:14px}
+.cap{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+
+.term{background:var(--term-bg);color:var(--term-fg);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;border-radius:8px;padding:14px 16px;overflow-x:auto;white-space:pre}
+.term .p{color:var(--term-dim)} .term .ok{color:var(--term-ok)} .term .no{color:var(--term-bad)}
+.chat{display:flex;flex-direction:column;gap:8px}
+.msg{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.msg .who{font-size:12.5px;font-weight:700;padding-top:2px;min-width:3.2em}
+.msg.h .who{color:var(--human)} .msg.a .who{color:var(--ai)}
+.msg .say{background:var(--sunk);border-radius:8px;padding:8px 12px}
+.mr{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mr-top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:10px 14px;background:var(--sunk)}
+.mr-top b{font-family:var(--f-display)}
+.mr-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.pill{font-size:12px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.pill.ok{color:var(--ci);border-color:var(--ci)} .pill.no{color:var(--bad);border-color:var(--bad)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px}
+.opt:hover{border-color:var(--muted)}
+.opt[aria-pressed="true"]{border-color:var(--human);background:var(--human-bg)}
+.opt b{display:block;font-family:var(--f-display);margin-bottom:2px}
+.callout{border-left:3px solid var(--muted);background:var(--sunk);padding:9px 13px;border-radius:0 6px 6px 0;font-size:14px}
+.callout.warn{border-color:var(--bad)} .callout.good{border-color:var(--ci)}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:14px}
+.kv dt{color:var(--muted);white-space:nowrap} .kv dd{margin:0}
+.relay{display:flex;flex-direction:column;gap:0}
+.relay li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.relay{list-style:none;margin:0;padding:0}
+.relay li:first-child{border-top:0}
+.gate{font-family:var(--f-mono);font-size:13px;line-height:1.8;border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--sunk)}
+.gate .ok{color:var(--ci)} .gate .no{color:var(--bad)}
+.gate .res{font-family:var(--f-display);font-weight:700;font-size:15px;margin-top:6px}
+.gate .next{font-family:var(--f-body);font-size:13.5px;color:var(--ink)}
+.toggles{display:flex;flex-wrap:wrap;gap:8px}
+.tgl{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 13px;font-size:13.5px}
+.tgl[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
+
+/* board */
+.board h2{margin-bottom:4px}
+.progress{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.progress i{display:block;height:100%;background:var(--ci);transition:width .35s}
+.cols{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.col h3{font-size:13.5px;display:flex;justify-content:space-between;align-items:baseline;padding-bottom:4px;border-bottom:2px solid var(--line)}
+.col.decide h3{border-color:var(--human)} .col.hands h3{border-color:var(--human)} .col.ai h3{border-color:var(--ai)} .col.blocked h3{border-color:var(--bad)}
+.col h3 span{font-family:var(--f-mono);font-weight:400;color:var(--muted)}
+.cards{display:flex;flex-direction:column;gap:6px;margin-top:8px;min-height:22px}
+.card{font-size:13.5px;background:var(--sunk);border-radius:6px;padding:6px 10px}
+.card.new{animation:pop .45s ease-out}
+.empty{font-size:13px;color:var(--muted)}
+@keyframes pop{from{transform:translateY(-4px);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.card.new{animation:none}.st{transition:none}.progress i{transition:none}}
+
+/* bench + ladder */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.bench-controls{display:flex;flex-direction:column;gap:14px;margin-top:12px}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
+select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+.ladder td button{width:100%;border:1px solid var(--line);border-radius:6px;padding:6px 4px;font-size:12.5px;font-weight:700;background:var(--surface)}
+.ladder td button.ai{background:var(--ai-bg);color:var(--ai);border-color:transparent}
+.ladder td button.hu{background:var(--human-bg);color:var(--human);border-color:transparent}
+.ladder td button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:1px}
+.ladder th,.ladder td{padding:6px 5px;border-bottom:0}
+.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.foot a{color:var(--accent)}
+@media (max-width:860px){.stage,.two{grid-template-columns:minmax(0,1fr)} h1{font-size:25px}}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <h1>共讀共推流程示範</h1>
+      <p class="lede">AI 執行開發，人類在平台上共同審查並推進進度。按「下一步」跟著一個橫跨軟體、韌體、硬體的案例走完一輪；在標示可操作的站點，你可以自己做決定。</p>
+      <span class="note">示範用虛構案例：專案、人員、數值、指令輸出皆為設計示意，非真實結果；aitw 工具尚未實作</span>
+    </div>
+    <div>
+      <div class="seg" role="group" aria-label="平台用語">
+        <button type="button" id="fg-gitlab" aria-pressed="true">GitLab</button>
+        <button type="button" id="fg-github" aria-pressed="false">GitHub</button>
+      </div>
+      <p class="forge-note" id="forgeNote"></p>
+    </div>
+  </header>
+
+  <section class="track-box" aria-label="流程接力軌道">
+    <div class="track-scroll"><div class="track" id="track"></div></div>
+    <div class="controls">
+      <button type="button" class="btn" id="prev">◀ 上一步</button>
+      <button type="button" class="btn primary" id="next">下一步 ▶</button>
+      <button type="button" class="btn" id="play">自動播放</button>
+      <span class="chip h">人類</span><span class="chip a">AI Agent</span><span class="chip c">CI 與 Gate</span>
+      <span class="counter" id="counter"></span>
+    </div>
+  </section>
+
+  <section class="stage">
+    <article class="panel" id="scene" aria-live="polite"></article>
+    <aside class="panel board" id="board" aria-label="看板"></aside>
+  </section>
+
+  <section class="two">
+    <div class="panel">
+      <h2>Gate 模擬器</h2>
+      <p class="muted small" style="margin-top:4px">合併前的機器檢查。調整條件，看哪一項會被擋下、下一步該誰做。</p>
+      <div class="bench-controls">
+        <div class="field"><label for="gLevel">這次變更的關卡等級</label>
+          <select id="gLevel">
+            <option value="G1">G1　一般程式變更</option>
+            <option value="G2">G2　介面契約變更（跨領域）</option>
+            <option value="G3">G3　硬體釋出（不可逆）</option>
+          </select></div>
+        <div class="field"><label>情況（點選切換）</label><div class="toggles" id="gConds"></div></div>
+        <div class="field"><label>誰按了核准</label><div class="toggles" id="gAppr"></div></div>
+        <div class="gate" id="gOut"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>三個領域，AI 能做到哪一階</h2>
+      <p class="muted small" style="margin-top:4px">驗證由便宜到昂貴分五階。藍色由 AI 與 CI 完成；橘色必須由人執行。點任一格看說明。</p>
+      <div class="tablewrap" style="margin-top:12px"><table class="ladder" id="ladder"></table></div>
+      <div class="callout" id="ladderNote" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）。本頁不連接任何真實系統、模型或設備。
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var forge="gitlab", pull="22k", cur=0, timer=null;
+var st={dr1:null, appr:{a:false,b:false,bot:false}, rv:null};
+var F={
+  gitlab:{mr:"MR", full:"Merge Request", id:function(n){return "!"+n}, ci:"GitLab CI pipeline", cmd:"aitw: ", approve:"在 MR 按核准", protect:"保護分支 + Pipelines must succeed",
+    note:"GitLab Free 的核准是選用的、不擋合併，所以由 pipeline 裡的 Gate job 強制；Premium 以上可再加平台的核准規則。"},
+  github:{mr:"PR", full:"Pull Request", id:function(n){return "#"+n}, ci:"GitHub Actions", cmd:"/", approve:"提交 Approve review", protect:"分支保護 + 必過檢查",
+    note:"GitHub 的分支保護可直接要求人類核准與必過檢查；Gate 檢查另外確認角色、版本與證據。"}
+};
+function f(){return F[forge]}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function tag(l){return '<span class="tag '+l+'">'+l+'</span>'}
+function other(){return pull==="22k"?"33k":"22k"}
+
+/* ---------- block renderers ---------- */
+function term(lines){return '<div class="term">'+lines.map(function(l){
+  var c=l.charAt(0), t=esc(l.slice(1));
+  return c==="$"?'<span class="p">$ '+t+'</span>':c==="+"?'<span class="ok">✔ '+t+'</span>':c==="-"?'<span class="no">✘ '+t+'</span>':c==="#"?'<span class="p">'+t+'</span>':t;
+}).join("\n")+'</div>'}
+function chat(ms){return '<div class="chat">'+ms.map(function(m){return '<div class="msg '+m[0]+'"><span class="who">'+esc(m[1])+'</span><div class="say">'+m[2]+'</div></div>'}).join("")+'</div>'}
+function table(head,rows){return '<div class="tablewrap"><table><thead><tr>'+head.map(function(h){return '<th>'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+c+'</td>'}).join("")+'</tr>'}).join("")+'</tbody></table></div>'}
+function cap(t){return '<div class="cap">'+t+'</div>'}
+function callout(t,k){return '<div class="callout '+(k||"")+'">'+t+'</div>'}
+function mr(title,n,pills,body){return '<div class="mr"><div class="mr-top"><b>'+f().mr+' '+f().id(n)+'</b><span>'+title+'</span><span class="pill">作者 aiteam-bot</span>'+pills.map(function(p){return '<span class="pill '+(p[1]||"")+'">'+p[0]+'</span>'}).join("")+'</div><div class="mr-body">'+body+'</div></div>'}
+function gate(title,lines,pass,next){return '<div class="gate"><div>'+title+'</div>'+lines.map(function(l){return '<div class="'+(l[0]?"ok":"no")+'">'+(l[0]?"✔":"✘")+' '+l[1]+'</div>'}).join("")+'<div class="res '+(pass?"ok":"no")+'">結果：'+(pass?"通過，可由人類合併":"未通過")+'</div>'+(next?'<div class="next">下一步：'+next+'</div>':"")+'</div>'}
+
+/* ---------- steps ---------- */
+var STEPS=[
+{lane:"h", t:"設定目標與邊界", who:"人員甲（Primary）", tool:"/mission-intake → mission.md",
+ story:"AI 只問問題，不替人決定目標。甲說清楚什麼算成功、什麼不做、哪些動作一定要人來。",
+ body:function(){return chat([
+   ["a","AI","完成時，什麼可量測的結果算成功？"],
+   ["h","甲","-20°C 到 60°C 的溫度量測誤差在 ±1°C 內，用樣板實測確認。"],
+   ["a","AI","哪些事情明確不做？哪些動作必須由人執行？"],
+   ["h","甲","不換 MCU、不改 PCB 佈局。改板、燒錄、溫箱量測由人做；BOM 釋出要我和丙都簽。"]
+ ])+callout("產出 <span class='mono'>mission.md</span>，以 "+f().mr+" 送出；甲核准合併後才算數。")},
+ board:{decide:[],acc:[],total:6}},
+
+{lane:"a", t:"拆解成工作包", who:"AI Orchestrator", tool:"/wp-plan M-001",
+ story:"AI 把目標拆成六個工作包，每個都寫明驗收條件、驗證方式、關卡等級，以及由誰執行。",
+ body:function(){return table(["工作包","內容","領域","執行者","關卡"],[
+   ["WP-001","量測鏈誤差預算分析","研究","AI","G0"],
+   ["WP-002","上拉電阻的最壞情況計算與模擬","硬體","AI","G2"],
+   ["WP-003","韌體改用查表內插換算溫度","韌體","AI","G1"],
+   ["WP-004","上位機 SOH 低溫補償","軟體","AI","G1"],
+   ["WP-005","樣板改裝與三點溫度量測","硬體","<b>人</b>","G3"],
+   ["WP-006","改版 BOM 釋出","硬體","人主導","G3"]])},
+ board:{ai:["規劃 M-001：拆解工作包"],acc:[],total:6}},
+
+{lane:"h", t:"核准計畫，凍結驗收條件", who:"人員甲", tool:f_approve,
+ story:"人類審的是「範圍對不對、驗收條件夠不夠嚴」。核准之後，AI 不能自己改驗收條件。",
+ body:function(){return mr("Plan：M-001 的六個工作包",2,[["甲 已核准","ok"]],
+   chat([["h","甲","CHANGE: WP-003 只寫「全量程誤差」，請加上表格端點與超出範圍的行為。"],
+         ["a","AI","已新增驗收條件 AC3（端點行為）。"]]))
+   +callout("合併後驗收條件與驗證指令<b>凍結</b>。之後要改，必須由人類決議。","good")},
+ board:{decide:[],acc:[],total:6}},
+
+{lane:"a", t:"執行硬體分析並留證", who:"AI 硬體工程 Agent", tool:"aitw evidence run",
+ story:"AI 在分支與沙盒內計算、模擬。每個結果都用指令留下證據；AI 自己產生的證據最高只能標 OBSERVED。",
+ body:function(){return term(["$aitw wp start WP-002","+相依：WP-001 已接受　關卡：G2","$aitw evidence run WP-002 --ac AC1 --kind calc -- python hw/calc/ntc_divider_worstcase.py",
+   "+EV-002-01 已記錄 · 結束碼 0 · 工作區乾淨","#  標籤 OBSERVED（agent 產生；需 CI 重跑或人類簽認才能成為 VERIFIED）",
+   "$aitw evidence run WP-002 --ac AC2 --kind sim -- make -C hw/sim run","+EV-002-02 已記錄 · 模擬結果標籤上限 OBSERVED"])
+   +callout("規格書找不到 -20°C 以下的容差表 → 照實登錄為 "+tag("UNKNOWN")+"，低溫容差標明為外推假設，不硬湊數字。","warn")},
+ board:{ai:["WP-002 計算與模擬"],acc:["WP-001"],total:6}},
+
+{lane:"h", t:"決策請求：AI 不自己選", who:"人員甲", tool:"決策請求 DR-001", act:true,
+ story:"AI 遇到需要人判斷的取捨，列出選項、影響與建議，請人決定。等待時 AI 改做不相依的工作，不空等也不代為決定。",
+ body:function(){
+   var h=cap("DR-001　上拉電阻由 10k 改為多少？（AI 建議 A）")+'<div class="opts">'
+    +'<button type="button" class="opt" data-dr="22k" aria-pressed="'+(st.dr1==="22k")+'"><b>A　22k</b>低溫段解析度改善（中）；高溫段略降。兩端較平衡。</button>'
+    +'<button type="button" class="opt" data-dr="33k" aria-pressed="'+(st.dr1==="33k")+'"><b>B　33k</b>低溫段改善較大；但 60°C 附近餘裕變小，且依賴外推假設。</button></div>';
+   if(st.dr1){h+=term(["#甲在 "+f().mr+" 留言（已驗證身份的留言才是決定的正本）",f().cmd+"decide DR-001 "+(st.dr1==="22k"?"A":"B")+"　"+(st.dr1==="22k"?"同意建議；高溫餘裕優先":"低溫優先；接受高溫餘裕風險")])
+     +(st.dr1==="33k"?callout("已記錄：此選擇依賴的外推假設（EV-002-04）列入風險，並在量測工作包中優先確認高溫點。","warn"):"")}
+   else h+=callout("請選一個選項。不選的話 WP-003、WP-005 會停在這裡。");
+   return h},
+ board:{decide:["DR-001　上拉 22k 或 33k？"],ai:["WP-004 測試骨架（不相依，先做）"],blocked:["WP-003、WP-005 等 DR-001"],acc:["WP-001"],total:6}},
+
+{lane:"c", t:"乾淨環境重跑，產生共讀包", who:"CI + Validator", tool:"aitw verify · aitw packet build",
+ story:"CI 依主幹上凍結的指令重跑。接著產生共讀包：人不必從差異自己拼全貌，並被告知哪些地方一定要看。",
+ body:function(){return cap("主張與證據")+table(["主張","標籤","範圍限制"],[
+   ["現行 10k 上拉在低溫段解析度不足，是主要誤差來源",tag("OBSERVED"),"計算模型，未實測"],
+   ["改為 "+pull+" 後，全量程最壞情況誤差可落在目標內",tag("HYPOTHESIS"),"低溫容差為外推；需樣板量測"],
+   ["建議樣板先以 "+pull+" 驗證",tag("RECOMMENDATION"),"不代表可釋出"]])
+   +cap("必看清單（由規則產生，AI 可加不可減）")+table(["項目","原因","預估"],[
+   ["<span class='mono'>interfaces/analog.yaml</span>","介面契約變更，影響軟韌硬","3 分"],
+   ["最壞情況計算的假設組合","結論的根基","10 分"],
+   ["標為 HYPOTHESIS 的主張","尚未驗證","3 分"],
+   ["UNKNOWN 缺口","資料不足之處","2 分"]])},
+ board:{ai:["WP-002 驗證與共讀包","WP-004 測試骨架"],acc:["WP-001"],total:6}},
+
+{lane:"h", t:"共讀：挑戰題檢驗理解", who:"人員乙（Backup）", tool:"/coread WP-002",
+ story:"Backup 不必跟完所有細節，只讀必看清單並回答一題。這是低負擔維持接手能力的關鍵時刻。",
+ body:function(){return chat([
+   ["a","AI","挑戰題：為什麼模擬通過，還不能把「"+pull+" 可達標」標成 VERIFIED？"],
+   ["h","乙",esc(f().cmd)+"understood　模擬只到第三階，而且低溫容差是外推值；要等樣板量測。"],
+   ["h","甲","Q: 高溫 60°C 的餘裕還剩多少？請在共讀包補上數字與依據。"],
+   ["a","AI","已補上並引用 EV-002-01；若依據不足會標 UNKNOWN。"]])
+   +callout("已讀 ≠ 已理解 ≠ 可接手。「可接手」只能由每月的接手演練取得。")},
+ board:{decide:["WP-002 共讀包（必看 4 項，約 18 分）"],ai:["WP-004 測試骨架"],acc:["WP-001"],total:6}},
+
+{lane:"c", t:"Gate：機器檢查核准", who:"CI Gate job", tool:"aitw gate check", act:true,
+ story:"這次動到介面契約，屬跨領域變更：硬體、韌體、軟體的負責人都要核准。試著按不同人的核准，看 Gate 怎麼判。",
+ body:function(){
+   var a=st.appr, lines=[[true,"範圍・驗收定義・證據完整・證據新鮮・標籤合規"],[true,"決策 DR-001 已由甲回覆（留言已回查）"]];
+   if(a.bot) lines.push([false,"aiteam-bot 的核准不計（Agent 身份）"]);
+   lines.push([a.a,"硬體、韌體負責人（甲）核准"+(a.a?"":"：尚缺")]);
+   lines.push([a.b,"軟體負責人（乙）核准"+(a.b?"":"：尚缺")]);
+   var pass=a.a&&a.b, next=pass?"":(!a.a?"請甲審查共讀包":"請乙審查介面契約變更（必看 1 項，約 3 分）");
+   return cap("誰按核准？（點選切換）")+'<div class="toggles">'
+    +'<button type="button" class="tgl" data-ap="a" aria-pressed="'+a.a+'">甲　硬體／韌體負責人</button>'
+    +'<button type="button" class="tgl" data-ap="b" aria-pressed="'+a.b+'">乙　軟體負責人</button>'
+    +'<button type="button" class="tgl" data-ap="bot" aria-pressed="'+a.bot+'">aiteam-bot（試試看）</button></div>'
+    +gate("Gate 報告 · WP-002 · 實際關卡 G2（跨領域）",lines,pass,next)},
+ board:function(){return {decide:(st.appr.a&&st.appr.b)?[]:["WP-002 等核准（甲、乙）"],ai:["WP-003 準備開工"],acc:(st.appr.a&&st.appr.b)?["WP-001","WP-002"]:["WP-001"],total:6}}},
+
+{lane:"a", t:"執行韌體，獨立驗證提出風險", who:"AI 韌體工程 Agent + Validator", tool:"/wp-run WP-003",
+ story:"驗收條件全過。但獨立的 Validator 把「驗收條件沒涵蓋到的風險」攤開給人看，不替人決定。",
+ body:function(){return term(["$aitw evidence run WP-003 --ac AC1 --kind test_run -- make -C fw test","+EV-003-01 已記錄 · 結束碼 0",
+   "$aitw wp submit WP-003","+證據完整 · 甲的待審數 1/3 · "+f().mr+" "+f().id(14)+" 送審","#"+f().ci+"：依主幹凍結的指令重跑","+AC1 AC2 AC3 通過"])
+   +callout("<b>Validator 發現 F1（風險）：</b>ADC 讀值超出表格上限（對應 NTC 斷線）時，函式回傳表格端點溫度且不報錯。<br>不在驗收範圍內 → 請人類判斷是否處理。","warn")
+   +callout("只能在實機確認的項目：取樣雜訊與濾波效果、實際轉換時間 → 已列入量測工作包。")},
+ board:{ai:["WP-003 驗證中"],acc:["WP-001","WP-002"],total:6}},
+
+{lane:"h", t:"共讀抓到問題", who:"人員乙、人員甲", tool:f_review, act:true,
+ story:"測試都過了、Validator 也給 PASS。你是甲，要核准還是要求修改？",
+ body:function(){
+   var h=chat([["a","AI","挑戰題：NTC 斷線時，韌體回報什麼溫度？上位機分得出來嗎？"],
+     ["h","乙","回傳表格端點的低溫值，沒有錯誤旗標；上位機會當成真的很冷。"]])
+    +'<div class="opts"><button type="button" class="opt" data-rv="ok" aria-pressed="'+(st.rv==="ok")+'"><b>核准</b>驗收條件都通過了。</button>'
+    +'<button type="button" class="opt" data-rv="chg" aria-pressed="'+(st.rv==="chg")+'"><b>要求修改</b>斷線與短路必須回報故障。</button></div>';
+   if(st.rv==="ok") h+=callout("若此時核准：感測器斷線時，系統會把「看似合理的低溫」當真，低溫補償跟著算錯。<b>驗收條件通過不等於沒有風險</b>——這正是必看清單與挑戰題存在的理由。示範接下來以「要求修改」繼續。","warn");
+   if(st.rv==="chg") h+=callout("WP-003 進入返工（第 1 次，上限 3 次）。失敗與修改紀錄都保留，不刪除。","good");
+   return h},
+ board:{decide:["WP-003 共讀包 r1（必看 3 項）"],acc:["WP-001","WP-002"],total:6}},
+
+{lane:"a", t:"返工觸及範圍外，再請示", who:"AI 韌體工程 Agent", tool:"決策請求 DR-002 → aitw gate check",
+ story:"要回報故障就得新增驗收條件、還會動到通訊介面，兩件事都不是 AI 能自己決定的。",
+ body:function(){return term(["#DR-002　新增驗收條件 AC4；通訊介面變更如何處理？","  A  擴大 WP-003 範圍納入介面變更（變成跨領域）","  B  WP-003 只做韌體內部偵測；另開 WP-007 處理介面與上位機（AI 建議）","#甲的留言",f().cmd+"decide DR-002 B"])
+   +gate("Gate 報告 · WP-003 · 第 2 版",[[true,"範圍：7 個檔案皆在工作包範圍內"],[true,"驗收定義：AC4 新增，已由 DR-002 授權"],[true,"證據新鮮：CI 驗證針對最新 commit"],[true,"人類核准：甲針對最新版本核准"]],true,"")
+   +callout("共讀包明列：僅主機端驗證；實機行為待量測。交給人燒錄的檔案由 CI 從已核准的版本重建，附雜湊。")},
+ board:{ai:["WP-007 介面旗標與上位機（新增）"],blocked:["WP-004 等 WP-007"],acc:["WP-001","WP-002","WP-003"],total:7}},
+
+{lane:"h", t:"人類任務：AI 準備、人動手", who:"人員丙（合格執行者）、人員甲", tool:"/human-task WP-005",
+ story:"實體動作一律由人執行。AI 準備程序書並分析紀錄；人照實記錄，包含沒做到的部分。",
+ body:function(){return '<ol class="relay">'
+   +'<li><span class="chip a">AI 準備</span><div>程序書：待測物、燒錄檔雜湊、三個溫度點、預期範圍、<b>中止條件</b>、空白紀錄表。</div></li>'
+   +'<li><span class="chip h">啟動核准</span><div>G3：丙與甲兩人核准後才能動手。</div></li>'
+   +'<li><span class="chip h">人執行</span><div>丙改裝樣板（上拉改 '+pull+'）、燒錄、溫箱量測。<b>偏離照實記：</b>溫箱最低只穩定在 -18°C，未達 -20°C。</div></li>'
+   +'<li><span class="chip a">AI 分析</span><div>「-18、25、60°C 三點誤差在 ±1°C 內」'+tag("OBSERVED")+'<br>「-20 到 60°C 已達成」'+tag("UNKNOWN")+'　沒量到的不外推。</div></li>'
+   +'<li><span class="chip h">人簽認</span><div>甲（非執行者）依原始資料簽認第一條 → '+tag("VERIFIED")+'，範圍照寫：單一樣板、低溫點 -18°C。</div></li></ol>'},
+ board:{decide:["DR-003　啟動核准（G3，需兩人）"],hands:["WP-005 樣板改裝與三點量測（丙）"],ai:["WP-007 介面旗標與上位機"],blocked:["WP-004 等 WP-007"],acc:["WP-001","WP-002","WP-003"],total:7}},
+
+{lane:"h", t:"每週共讀共推會", who:"甲、乙、丙", tool:"aitw sync agenda",
+ story:"三十分鐘，議程由工具產生。人類在這裡清決策、問問題、排下週、指派實體任務。",
+ body:function(){return table(["時間","段落","本週內容"],[
+   ["0–5 分","決策佇列","是否補量 -20°C？ → 甲：開 WP-008 借用可達 -20°C 的溫箱"],
+   ["5–15 分","共讀三大變更","介面契約變更・斷線偵測缺口・量測偏離"],
+   ["15–20 分","挑戰題","乙：為什麼目標現在仍是 UNKNOWN？"],
+   ["20–25 分","下週排序","WP-008 指派丙與日期；WP-007 先於 WP-004"],
+   ["25–30 分","指標","平均審查等待 0.8 天・返工 1 次・待審 2/3"]])
+   +callout("進度 = 已被接受的工作包：<b>4 / 8</b>。工作包總數從 6 變 8，是因為過程中發現了該做的事——這比「AI 說 90% 完成」誠實。BOM 釋出維持卡住，直到 -20°C 補量完成。","good")},
+ board:{hands:["WP-008 補量 -20°C（丙，已排日期）"],ai:["WP-007 介面旗標與上位機"],blocked:["WP-006 BOM 釋出：等 WP-008","WP-004 等 WP-007"],acc:["WP-001","WP-002","WP-003","WP-005"],total:8}}
+];
+function f_approve(){return f().approve}
+function f_review(){return f().mr+" 審查"}
+// fix the two board cards that carry forge-specific ids
+function boardOf(i){var s=STEPS[i], b=typeof s.board==="function"?s.board():s.board;
+  b=JSON.parse(JSON.stringify(b));
+  if(i===0) b.decide=[f().mr+" "+f().id(1)+"　Mission：核准目標與邊界"];
+  if(i===2) b.decide=[f().mr+" "+f().id(2)+"　Plan：六個工作包與驗收條件"];
+  return b}
+
+/* ---------- track ---------- */
+var track=document.getElementById("track"), LROW={h:1,a:2,c:3};
+function buildTrack(){
+  var h='<svg aria-hidden="true"></svg>'
+   +'<div class="lane-label h" style="grid-row:1">人類</div><div class="lane-label a" style="grid-row:2">AI Agent</div><div class="lane-label c" style="grid-row:3">CI・Gate</div>'
+   +'<div class="lane-bg first" style="grid-row:1"></div><div class="lane-bg" style="grid-row:2"></div><div class="lane-bg" style="grid-row:3"></div>';
+  STEPS.forEach(function(s,i){h+='<button type="button" class="st '+s.lane+'" data-i="'+i+'" style="grid-row:'+LROW[s.lane]+';grid-column:'+(i+2)+'" aria-label="第 '+(i+1)+' 站：'+s.t+'">'+(i+1)+'</button>'});
+  track.innerHTML=h;
+}
+function drawLines(){
+  var svg=track.querySelector("svg"), r0=track.getBoundingClientRect(), pts=[];
+  track.querySelectorAll(".st").forEach(function(b){var r=b.getBoundingClientRect();pts.push([r.left-r0.left+r.width/2,r.top-r0.top+r.height/2])});
+  svg.setAttribute("viewBox","0 0 "+r0.width+" "+r0.height);
+  var h="";for(var i=0;i<pts.length-1;i++){h+='<path class="'+(i<cur?"done":"")+'" d="M'+pts[i][0]+' '+pts[i][1]+' L'+pts[i+1][0]+' '+pts[i+1][1]+'"/>'}
+  svg.innerHTML=h;
+}
+
+/* ---------- render ---------- */
+var LANE={h:["h","人類"],a:["a","AI Agent"],c:["c","CI 與 Gate"]}, prevCards={};
+function renderScene(){
+  var s=STEPS[cur], tool=typeof s.tool==="function"?s.tool():s.tool;
+  document.getElementById("scene").innerHTML='<div class="step-head"><span class="chip '+LANE[s.lane][0]+'">'+LANE[s.lane][1]+'</span><h2><span class="mono">'+(cur+1)+'</span>　'+s.t+'</h2>'+(s.act?'<span class="pill">可操作</span>':"")+'</div>'
+   +'<p class="story">'+s.story+'</p><p class="toolline">'+esc(s.who)+'　·　<span class="mono">'+esc(tool)+'</span></p><div class="blocks">'+s.body()+'</div>';
+}
+function renderBoard(){
+  var b=boardOf(cur), cols=[["decide","等我決定"],["hands","等我動手"],["ai","AI 進行中"],["blocked","卡住"]], seen={};
+  var acc=b.acc||[], pct=Math.round(acc.length/b.total*100);
+  var h='<h2>看板</h2><p class="muted small">人只需要看這四欄。進度只算已被接受的工作包。</p>'
+   +'<div class="progress" role="img" aria-label="已接受 '+acc.length+' / '+b.total+'"><i style="width:'+pct+'%"></i></div>'
+   +'<p class="small"><b class="mono">'+acc.length+' / '+b.total+'</b> 已接受'+(acc.length?'　<span class="muted">'+acc.join("・")+'</span>':"")+'</p><div class="cols">';
+  cols.forEach(function(c){var items=b[c[0]]||[];
+    h+='<div class="col '+c[0]+'"><h3>'+c[1]+'<span>'+items.length+'</span></h3><div class="cards">'
+     +(items.length?items.map(function(t){seen[t]=1;return '<div class="card'+(prevCards[t]?"":" new")+'">'+esc(t)+'</div>'}).join(""):'<span class="empty">—</span>')+'</div></div>'});
+  document.getElementById("board").innerHTML=h+'</div>'; prevCards=seen;
+}
+function render(){
+  track.querySelectorAll(".st").forEach(function(b,i){b.classList.toggle("cur",i===cur);b.classList.toggle("done",i<cur);b.setAttribute("aria-current",i===cur?"step":"false")});
+  drawLines(); renderScene(); renderBoard();
+  document.getElementById("counter").textContent=(cur+1)+" / "+STEPS.length;
+  document.getElementById("prev").disabled=cur===0; document.getElementById("next").disabled=cur===STEPS.length-1;
+  var b=track.querySelector(".st.cur"), sc=track.parentNode;
+  if(b&&sc.scrollWidth>sc.clientWidth){sc.scrollLeft=Math.max(0,b.offsetLeft-sc.clientWidth/2)}
+}
+function applyDefaults(i){ // leaving an interactive station without choosing: take the demo's default
+  if(i===4&&!st.dr1){st.dr1="22k";pull="22k"}
+  if(i===7){st.appr.a=true;st.appr.b=true;st.appr.bot=false}
+  if(i===9&&st.rv!=="chg"){st.rv="chg"}
+}
+function go(n){if(n<0||n>=STEPS.length)return; if(n>cur){for(var i=cur;i<n;i++)applyDefaults(i)} cur=n; render()}
+function stop(){if(timer){clearInterval(timer);timer=null;document.getElementById("play").textContent="自動播放"}}
+document.getElementById("prev").onclick=function(){stop();go(cur-1)};
+document.getElementById("next").onclick=function(){stop();go(cur+1)};
+document.getElementById("play").onclick=function(){
+  if(timer){stop();return}
+  if(cur===STEPS.length-1)go(0);
+  this.textContent="暫停";
+  timer=setInterval(function(){if(cur>=STEPS.length-1){stop()}else go(cur+1)},5500)};
+track.addEventListener("click",function(e){var b=e.target.closest(".st");if(b){stop();go(+b.dataset.i)}});
+document.addEventListener("keydown",function(e){if(e.target.closest("select,input,textarea"))return;if(e.key==="ArrowRight"){stop();go(cur+1)}if(e.key==="ArrowLeft"){stop();go(cur-1)}});
+document.getElementById("scene").addEventListener("click",function(e){
+  var o=e.target.closest("[data-dr]"); if(o){stop();st.dr1=o.dataset.dr;pull=st.dr1;renderScene();return}
+  var a=e.target.closest("[data-ap]"); if(a){stop();st.appr[a.dataset.ap]=!st.appr[a.dataset.ap];renderScene();renderBoard();return}
+  var r=e.target.closest("[data-rv]"); if(r){stop();st.rv=r.dataset.rv;renderScene()}
+});
+function setForge(k){forge=k;
+  document.getElementById("fg-gitlab").setAttribute("aria-pressed",k==="gitlab");
+  document.getElementById("fg-github").setAttribute("aria-pressed",k==="github");
+  document.getElementById("forgeNote").textContent=f().note; prevCards={}; render(); renderGate()}
+document.getElementById("fg-gitlab").onclick=function(){setForge("gitlab")};
+document.getElementById("fg-github").onclick=function(){setForge("github")};
+
+/* ---------- gate bench ---------- */
+var CONDS=[["scope","變更超出工作包範圍",false],["human","改了人類專屬檔案（政策、CI 設定）",false],["accept","AI 放寬了驗收條件",false],
+  ["stale","CI 通過後又改了程式",false],["label","AI 把自己的結果標成 VERIFIED",false],["dr","還有決策請求沒人回覆",false],["check","檢查表未逐項填寫",false]];
+var APPR=[["a","甲（Primary）",true],["b","乙（軟體負責人）",false],["c","丙（合格審查者）",false],["bot","aiteam-bot",false],["old","核准是針對舊版本",false]];
+var gs={}; CONDS.concat(APPR).forEach(function(c){gs[c[0]]=c[2]});
+function tgls(el,list){el.innerHTML=list.map(function(c){return '<button type="button" class="tgl" data-k="'+c[0]+'" aria-pressed="'+gs[c[0]]+'">'+c[1]+'</button>'}).join("")}
+function renderGate(){
+  tgls(document.getElementById("gConds"),CONDS); tgls(document.getElementById("gAppr"),APPR);
+  var lv=document.getElementById("gLevel").value, L=[], next=[];
+  function add(ok,good,bad,who){L.push([ok,ok?good:bad]); if(!ok&&who)next.push(who)}
+  add(!gs.scope,"範圍：變更都在工作包範圍內","範圍：有檔案超出工作包宣告的路徑","AI 拆成新工作包，或請人類擴大範圍");
+  add(!gs.human,"人類專屬檔案：未變動","人類專屬檔案被 Agent 修改（"+(forge==="gitlab"?"CI 設定應放在 AI 無法寫入的獨立專案":"政策與 workflow 僅人類可改")+"）","由人類提交並經管理者核准");
+  add(!gs.accept,"驗收定義：與主幹一致","驗收定義與主幹不一致，且沒有人類授權的決策","人類決定是否真的要改驗收條件");
+  add(true,"證據完整：每條驗收條件都有證據","");
+  add(!gs.stale,"證據新鮮：CI 驗證針對最新版本","證據過期：CI 驗證針對的是舊版本","等 CI 重跑");
+  add(!gs.label,"標籤合規：AI 產生的證據最高為 OBSERVED","標籤違規：VERIFIED 只能來自 CI 重跑或人類簽認","AI 更正標籤");
+  add(!gs.dr,"決策：皆已由人類回覆，留言已回查","決策：仍有未回覆的決策請求","人類以 "+f().cmd+"decide 回覆");
+  if(lv==="G3") add(!gs.check,"檢查表：逐項有結果與依據","檢查表：未逐項填寫結果與依據","審查會議逐項確認");
+  if(gs.bot) L.push([false,"aiteam-bot 的核准不計（Agent 身份）"]);
+  var a=gs.a&&!gs.old, b=gs.b&&!gs.old, c=gs.c&&!gs.old;
+  if(gs.old&&(gs.a||gs.b||gs.c)){L.push([false,"核准針對舊版本：新 commit 之後的核准才算"]);next.push("請核准者重新審查最新版本")}
+  if(lv==="G1") add(a||c,"人類核准：1 位（Primary 或 Reviewer）","人類核准：需要 1 位（Primary 或 Reviewer），目前 0 位","請甲或丙審查共讀包");
+  if(lv==="G2"){add(a,"人類核准：Primary（甲）","人類核准：必須包含 Primary（甲）","請甲審查");add(b,"跨領域：軟體負責人（乙）核准","跨領域：尚缺軟體負責人（乙）","請乙審查介面契約變更")}
+  if(lv==="G3") add(a&&c,"人類核准：2 位，含 Primary 與合格審查者","人類核准：不可逆動作需要 2 位（Primary + 合格審查者）","需甲與丙都核准；單人無法通過");
+  var pass=L.every(function(l){return l[0]});
+  document.getElementById("gOut").innerHTML='<div>Gate 報告 · 關卡 '+lv+' · 強制方式：'+f().protect+'</div>'+L.map(function(l){return '<div class="'+(l[0]?"ok":"no")+'">'+(l[0]?"✔":"✘")+' '+esc(l[1])+'</div>'}).join("")
+   +'<div class="res '+(pass?"ok":"no")+'">結果：'+(pass?"通過，可由人類合併":"未通過")+'</div>'+(next.length?'<div class="next">下一步：'+esc(next.join("；"))+'</div>':"");
+}
+["gConds","gAppr"].forEach(function(id){document.getElementById(id).addEventListener("click",function(e){var b=e.target.closest("[data-k]");if(b){gs[b.dataset.k]=!gs[b.dataset.k];renderGate()}})});
+document.getElementById("gLevel").onchange=renderGate;
+
+/* ---------- ladder ---------- */
+var LAD={cols:["V1 靜態","V2 單元／計算","V3 整合／模擬","V4 實機受控","V5 真實條件"],
+ rows:[["軟體",["ai","lint、型別檢查、相依掃描。AI 與 CI 自動完成。"],["ai","單元測試。CI 在乾淨環境重跑才算數。"],["ai","整合測試、契約測試。"],["ai","預備環境驗證；部署到預備環境仍需依政策核准。"],["hu","正式環境部署：G3，由人核准並執行，需有回退演練紀錄。"]],
+  ["韌體",["ai","靜態分析、可為目標編譯、大小報告。"],["ai","主機端單元測試，周邊以替身模擬。"],["ai","模擬器或協定層測試（若可行），並標明未經實機驗證。"],["hu","開發板實測：AI 準備燒錄檔與測試腳本，人燒錄並記錄板號、雜湊、儀器校正編號。"],["hu","產品硬體、長時間與邊界條件：人執行，G3。"]],
+  ["硬體",["ai","電氣與設計規則檢查、BOM 規則檢查。"],["ai","容差、降額、最壞情況計算腳本；規格書參數附頁碼。"],["ai","電路模擬。結果最高只能是 OBSERVED，不能單獨支持「硬體已驗證」。"],["hu","打樣板首次上電與量測：AI 寫程序書，人動手，另一人簽認。"],["hu","環境測試、安規、EMC：人執行，依機構規範。"]]]};
+var lsel=[1,3];
+function renderLadder(){
+  var h='<thead><tr><th></th>'+LAD.cols.map(function(c){return '<th>'+c+'</th>'}).join("")+'</tr></thead><tbody>';
+  LAD.rows.forEach(function(r,i){h+='<tr><th>'+r[0]+'</th>'+r.slice(1).map(function(c,j){return '<td><button type="button" class="'+c[0]+'" data-r="'+i+'" data-c="'+j+'" aria-pressed="'+(lsel[0]===i&&lsel[1]===j)+'">'+(c[0]==="ai"?"AI＋CI":"人")+'</button></td>'}).join("")+'</tr>'});
+  document.getElementById("ladder").innerHTML=h+'</tbody>';
+  var c=LAD.rows[lsel[0]][lsel[1]+1];
+  document.getElementById("ladderNote").innerHTML='<b>'+LAD.rows[lsel[0]][0]+'　'+LAD.cols[lsel[1]]+'：</b>'+c[1];
+}
+document.getElementById("ladder").addEventListener("click",function(e){var b=e.target.closest("button");if(b){lsel=[+b.dataset.r,+b.dataset.c];renderLadder()}});
+
+buildTrack(); setForge("gitlab"); renderLadder();
+window.addEventListener("resize",drawLines);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawLines);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# evidence/manifest.yaml — 證據清單（只增不改；重跑產生新編號）
+wp: WP-000
+items:
+  - id: EV-000-01
+    ac: AC1
+    kind: test_run
+    title: <這筆證據證明什麼>
+    produced_by: "agent:engineer-sw"   # agent:<role> | ci:<run-id> | human:<handle>（由工具依環境填寫）
+    command: "<實際執行的指令>"
+    exit_code: 0
+    git_sha: "<commit>"
+    worktree_dirty: false
+    started_at: "2026-01-01T00:00:00Z"
+    duration_s: 0.0
+    env: {runner: sandbox, tool_versions: {}}
+    outputs:
+      - {path: "evidence/EV-000-01.log", sha256: "<雜湊>"}
+    ladder: V2
+    label: OBSERVED                    # agent 產生者最高為 OBSERVED
+    verified_by: null                  # ci:<run-id> | human:<handle>
+
+  - id: EV-000-02                      # 規格書引用範例
+    ac: AC2
+    kind: datasheet
+    produced_by: "agent:researcher"
+    source: {document: "<文件名>", revision: "<版次>", page: 0}
+    value: {parameter: "<參數>", text: "<擷取值>", conditions: "<條件>"}
+    label: OBSERVED
+
+  - id: EV-000-03                      # 人類量測範例（見 human-task-record.md）
+    ac: AC3
+    kind: measurement
+    produced_by: "human:<handle>"
+    git_sha: "<commit>"
+    conditions:
+      dut: {id: "<待測物編號>", hw_rev: "<硬體版本>", fw_sha256: "<燒錄檔雜湊>"}
+      instruments: [{type: "<儀器>", cal_id: "<校正編號>"}]
+      ambient: "<環境條件>"
+      deviations: []
+    outputs:
+      - {uri: "<受控儲存位置>", sha256: "<雜湊>"}   # 原始資料不進公開 repo
+    ladder: V4
+    label: OBSERVED
+    verified_by: null                  # 由非執行者的人類簽認後填 human:<handle>

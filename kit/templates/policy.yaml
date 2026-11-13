@@ -1,0 +1,43 @@
+# .aiteam/policy.yaml — 路徑政策與核准規則（樣板）
+# 人類專屬檔案。專案可調嚴；Agent 不可調鬆。
+policy_version: 1
+
+gates:
+  G0: {approvals: 1, roles_any: [primary, backup, reviewer], review_tier: R1, batch: true}
+  G1: {approvals: 1, roles_any: [primary, reviewer], review_tier: R2}
+  G2:
+    approvals: 1
+    roles_all: [primary]
+    review_tier: R2
+    coread: {role: backup, blocking: false, escalate_after_workdays: 3}
+  G3:
+    approvals: 2
+    roles_all: [primary]
+    roles_any: [reviewer]
+    review_tier: R3
+    checklist_required: true
+    start_approval: required
+
+paths:
+  - {match: "docs/**",                 domain: sys, min_gate: G0}
+  - {match: "sw/**",                   domain: sw,  min_gate: G1}
+  - {match: "fw/src/**",               domain: fw,  min_gate: G1}
+  - {match: "fw/src/protection/**",    domain: fw,  min_gate: G2, safety_critical: true, checklist: fw-safety-review}
+  - {match: "fw/boot/**",              domain: fw,  min_gate: G2, safety_critical: true, checklist: fw-safety-review}
+  - {match: "hw/calc/**",              domain: hw,  min_gate: G1}
+  - {match: "hw/sim/**",               domain: hw,  min_gate: G1}
+  - {match: "hw/schematic/**",         domain: hw,  min_gate: G2}
+  - {match: "hw/release/**",           domain: hw,  min_gate: G3, checklist: hw-release-g3}
+  - {match: "knowledge/interfaces/**", domain: sys, min_gate: G2, cross_domain: [hw, fw, sw]}
+  - {match: ".aiteam/**",              human_only: true}
+  - {match: ".github/**",              human_only: true}
+  - {match: "CODEOWNERS",              human_only: true}
+
+must_read:                   # 一律列入必看清單的規則（Agent 可加不可減）
+  - safety_critical_paths
+  - interface_changes
+  - tests_removed_or_skipped
+  - acceptance_changes
+  - validator_disagreements
+  - hypothesis_claims
+  - human_task_deviations
