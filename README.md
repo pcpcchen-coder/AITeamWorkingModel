@@ -48,6 +48,7 @@ Human Backup ── challenges / takeover┘             │
 | [05 安全與治理](docs/05-security-and-governance.md) | 權限、機密、Agent 工具防護、審計 |
 | [06 導入路線圖與 KPI](docs/06-rollout-and-kpi.md) | 90 天分階段導入、驗收標準 |
 | [07 工程實作 Backlog](docs/07-engineering-backlog.md) | 可交給 Claude Code / Codex 的任務拆解 |
+| [08 討論整合與決策](docs/08-decision-log.md) | 原始問題 → 目標模式、ADR 草案、待確認條件 |
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
 | [互動 Demo](demo/mission-control.html) | 單檔 HTML、模擬資料、離線可用 |
