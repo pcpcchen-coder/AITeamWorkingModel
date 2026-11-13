@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI R&D Mission Control · Offline Demo</title>
+<style>
+:root{font-family:ui-sans-serif,system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#1e2d40;background:#f2f5f9;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+header{background:#11253e;color:white;padding:17px 24px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{font-weight:800;font-size:20px;letter-spacing:.2px}.brand small{font-size:11px;display:block;font-weight:400;opacity:.73;margin-top:4px}
+.demo{background:#ffe4a5;color:#674b06;padding:5px 9px;border-radius:30px;font-size:11px;font-weight:800}
+header select{background:#243c59;color:white;border:1px solid #59728e;border-radius:9px;padding:9px}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 87px)}nav{background:#1b3048;color:#bfcddd;padding:18px 10px}
+nav button{display:block;width:100%;border:0;border-radius:9px;text-align:left;background:transparent;color:inherit;padding:13px;cursor:pointer;margin:3px 0}nav button.active{background:#2c567f;color:white;font-weight:700}nav button:hover{background:#294562}
+main{padding:22px;max-width:1200px;width:100%;margin:auto}h1{font-size:25px;margin:0 0 5px}h2{font-size:17px;margin:0 0 12px}h3{font-size:15px;margin:6px 0}p{line-height:1.6;margin:6px 0}.muted{color:#62758c}.mini{font-size:12px}.lead{margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.cards4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card{background:white;border-radius:13px;border:1px solid #dce5ef;padding:18px;box-shadow:0 2px 7px #16334f09;margin-bottom:14px}
+.kpi strong{font-size:27px;display:block;color:#153c67}.kpi span{font-size:12px;color:#687d94}
+.line{height:9px;background:#dde8f3;border-radius:12px;overflow:hidden}.fill{height:100%;width:60%;background:#3779b7}
+.tag{display:inline-block;padding:4px 7px;margin:2px;border-radius:6px;background:#e7f0fb;color:#255d90;font-size:11px;font-weight:700}.warn{background:#fff1d8;color:#95600d}.bad{background:#ffebe7;color:#a43d2f}.good{background:#e0f6e9;color:#1a7750}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.divider{border-top:1px solid #e7edf4;margin:13px 0}
+.btn{border:1px solid #c7d6e7;background:white;color:#1b507f;border-radius:8px;padding:8px 11px;font-weight:650;font-size:13px}
+.btn.primary{background:#225c9a;color:#fff;border-color:#225c9a}.btn.safe{background:#e0f4ea;color:#196840;border-color:#bbdfce}.btn.negative{background:#ffede8;color:#a44335;border-color:#f4c5bd}
+.btn:hover:not(:disabled){filter:brightness(.96)}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.task{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #e8eef5}.task:first-child{border:0}.dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:6px;background:#6889a8}
+.dot.green{background:#27a16c}.dot.orange{background:#e5a124}.dot.blue{background:#2e81c8}
+.task .detail{flex:1}.task .desc{font-size:12px;color:#677c8f;margin-top:5px}
+textarea{width:100%;min-height:76px;resize:vertical;border-radius:9px;border:1px solid #b9c9dc;padding:10px;margin-top:7px}
+input[type=checkbox]{accent-color:#255e9d}.check{display:block;margin:9px 0;font-size:13px}
+.alert{background:#fff9eb;border:1px solid #f4dfaf;color:#745309;border-radius:10px;padding:12px;font-size:13px}
+.sample{background:#eef5fb;border:1px solid #d3e4f3;color:#2c4b6d;border-radius:10px;padding:12px;font-size:13px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:#11273e;color:#dfe9f5;padding:14px;border-radius:9px}
+.hidden{display:none}.review-thread{padding:10px 0;border-bottom:1px solid #e5ecf4;font-size:13px}
+#toast{position:fixed;bottom:18px;right:18px;background:#17344e;color:white;padding:12px 16px;border-radius:10px;box-shadow:0 6px 20px #17344e33;display:none;z-index:10}
+footer{color:#728395;font-size:12px;margin:26px 0;text-align:center}
+@media(max-width:850px){.cards4{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}nav{display:flex;overflow-x:auto;gap:5px;padding:8px}nav button{width:auto;white-space:nowrap;padding:10px}main{padding:14px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="brand">◈ AI R&D Mission Control <span class="demo">OFFLINE MOCK</span><small>AI 主動推進 × 人類共讀 × 可驗證備援</small></div></div>
+  <label>目前查看角色 <select id="role"><option value="primary">Primary / Research Owner</option><option value="backup">Backup / Secondary Owner</option><option value="reviewer">Reviewer</option><option value="manager">Manager</option></select></label>
+</header>
+<div class="layout">
+<nav aria-label="工作區"><button class="active" data-tab="mission">◎ AI Mission Board</button><button data-tab="review">◫ Human Co-Review</button><button data-tab="backup">◇ Backup Digest</button><button data-tab="takeover">⇄ Takeover Mode</button><button data-tab="portfolio">▤ Portfolio</button></nav>
+<main>
+<div id="mission" class="page">
+<h1>AI Mission Board</h1><p class="muted lead">虛構專案：低溫條件下的 SOH 演算法研究 · 沒有連接任何真實 Repo、LLM 或實驗設備</p>
+<div class="cards4">
+<div class="card kpi"><strong>6 / 10</strong><span>驗收完成任務</span></div><div class="card kpi"><strong>1</strong><span>待人工決策</span></div><div class="card kpi"><strong>2</strong><span>未驗證假設</span></div><div class="card kpi"><strong>L2</strong><span>Backup 演練能力（示意）</span></div>
+</div>
+<div class="grid"><section class="card"><div class="row"><h2>AI 任務推進</h2><span class="tag">已核准沙盒執行</span></div>
+<div class="line"><div class="fill"></div></div><p class="mini muted">完成度依 10 項示意驗收項目計算；非 AI 猜測值。</p>
+<div class="task"><span class="dot green"></span><div class="detail"><b>資料清理與版本比對</b><div class="desc">ACCEPTED · Sample Dataset v1</div></div><button class="btn" data-evidence="data">證據</button></div>
+<div class="task"><span class="dot green"></span><div class="detail"><b>兩種模型比較腳本</b><div class="desc">ACCEPTED · Test run mock-021</div></div><button class="btn" data-evidence="model">證據</button></div>
+<div class="task"><span class="dot blue"></span><div class="detail"><b>敏感度分析</b><div class="desc">RUNNING · 僅沙盒分析</div></div><button class="btn" data-evidence="analysis">來源</button></div>
+<div class="task"><span class="dot orange"></span><div class="detail"><b>新增交叉驗證假設</b><div class="desc">IN_REVIEW · 需要人類決策</div></div><button class="btn" data-tab-open="review">共讀</button></div>
+</section><section class="card"><h2>AI 建議與審查重點</h2><div class="alert"><b>待決策：</b>AI 提議加入溫度 × 倍率交互影響的檢驗，但現有資料不足；這只是 HYPOTHESIS。</div><p><span class="tag">RECOMMENDATION</span> 建議先在授權的歷史資料/模擬資料中比較，不直接控制實體設備。</p><p><span class="tag warn">UNKNOWN</span> 無法確定新假設是否適用於其他電芯批次。</p><p class="mini muted">Primary 核准下一階段範圍後，AI 才能在允許的工具與資源額度內繼續。</p><div class="buttons"><button class="btn primary" data-tab-open="review">開啟共讀與決策</button><button class="btn" data-tab-open="backup">檢視備援摘要</button></div></section></div>
+</div>
+<div id="review" class="page hidden">
+<h1>Human–AI Co-Review</h1><p class="muted lead">所有人共讀同一份版本化成果；AI 提建議，但不代表人類審核通過。</p>
+<div class="grid"><section class="card"><div class="row"><h2>Artifact #AR-003 · rev.3</h2><span id="reviewStatus" class="tag warn">IN_REVIEW</span></div>
+<h3>低溫誤差分析的新假設（虛構）</h3><p>模型誤差可能受到溫度與放電倍率交互作用影響，因此建議新增分層交叉驗證。</p>
+<p><span class="tag warn">HYPOTHESIS</span><span class="tag">來源：mock-021</span><span class="tag bad">尚無實驗採認</span></p>
+<div class="divider"></div><b>證據／缺口</b><p class="mini">示意來源：tests/mock-021.json · rev.1（虛構）；缺少可代表不同電芯批次的獨立資料集。</p>
+<div class="buttons"><button class="btn" data-evidence="analysis">檢視示意證據</button><button id="approve" class="btn safe">核准下一階段沙盒分析</button><button id="reject" class="btn negative">要求補充證據</button></div>
+<p id="decisionNote" class="mini muted">本介面所有核准／退回只會修改頁面記憶體中的模擬狀態。</p></section>
+<section class="card"><h2>共享評論區</h2><div id="threads"><div class="review-thread"><b>Backup：</b> 如何排除倍率影響？請提出可否證的測試。</div><div class="review-thread"><b>AI：</b> 建議分層驗證，但目前沒有足夠證據支持實際效果。</div></div>
+<label for="comment">新增評論（本頁記憶體內）</label><textarea id="comment" placeholder="例如：建議先檢查資料分布，再決定是否採納假設。"></textarea><div class="buttons"><button id="addComment" class="btn primary">提交評論</button></div></section></div>
+</div>
+<div id="backup" class="page hidden">
+<h1>Backup Weekly Digest</h1><p class="muted lead">目標：每週精選 3–5 項需要關注的變更，不要求每天跟進細節。</p>
+<div class="card"><h2>本週重大差異（虛構）</h2>
+<div class="task"><span class="dot green"></span><div class="detail"><b>模型測試腳本新增回歸檢查</b><div class="desc">影響：可重現性改善 · AI 已完成示意測試</div></div><span class="tag good">資料已編目</span></div>
+<div class="task"><span class="dot orange"></span><div class="detail"><b>低溫假設仍待審核</b><div class="desc">影響：下一輪實驗規劃可能改變</div></div><button class="btn" data-tab-open="review">前往共讀</button></div>
+<div class="task"><span class="dot blue"></span><div class="detail"><b>實驗 manifest 應增加資料批次標籤</b><div class="desc">影響：未來接手重現性 · 資料尚未補齊</div></div><span class="tag warn">UNKNOWN</span></div>
+<div class="divider"></div><label class="check"><input id="readDigest" type="checkbox"> 我已閱讀此摘要（不等於達成 L2/L3 備援能力）</label><button class="btn primary" data-tab-open="takeover">進入接手演練</button></div>
+</div>
+<div id="takeover" class="page hidden">
+<h1>Takeover Mode</h1><p class="muted lead">Backup 不詢問 Primary，使用可追溯接手包與已核准的 AI，獨立完成驗證任務。</p>
+<div class="grid"><section class="card"><h2>接手包 snapshot v0.1</h2>
+<p><b>當前目標：</b>重現示意模型的回歸測試</p><p><b>程式版本：</b>demo-commit-001（虛構）</p><p><b>資料集：</b>demo-sample-v1（虛構）</p><p><b>已知風險：</b>新假設缺少跨批次驗證</p><p><b>環境：</b>隔離沙盒，不涉及實體設備</p><p><b>任務驗收：</b>重現輸出並說明一項未驗證範圍</p>
+<div class="buttons"><button id="startTakeover" class="btn primary">開始演練（模擬）</button><button class="btn" data-evidence="takeover">查看接手包來源</button></div>
+</section><section class="card"><h2>演練紀錄（模擬）</h2><p id="takeoverState" class="alert">尚未開始；正式版會保存開始時間、沙盒執行紀錄及測試證據。</p>
+<label for="takeoverText">提交演練說明（不會自動判定通過）</label><textarea id="takeoverText" placeholder="例如：測試指令、觀測結果、版本、失敗原因……"></textarea>
+<div class="buttons"><button id="submitTakeover" class="btn" disabled>提交待 Reviewer 審查</button><button id="reviewTakeover" class="btn safe" disabled>Reviewer 標記示意通過</button></div>
+</section></div>
+</div>
+<div id="portfolio" class="page hidden">
+<h1>R&D Continuity Portfolio</h1><p class="muted lead">管理視角示例：只呈現有來源的交接能力、失效知識與風險，不以出席會議代替演練。</p>
+<div class="cards4"><div class="card kpi"><strong>4</strong><span>示例研究專案</span></div><div class="card kpi"><strong>2</strong><span>L2+ 備援</span></div><div class="card kpi"><strong>2</strong><span>高風險單點項目</span></div><div class="card kpi"><strong>1</strong><span>待審查接手演練</span></div></div>
+<div class="card"><h2>項目 / 備援能力（完全虛構）</h2>
+<div class="task"><span class="dot green"></span><div class="detail"><b>SOH Algorithm</b><div class="desc">Primary A / Backup B · L2 · 演練記錄 mock-011</div></div><span class="tag good">已驗證</span></div>
+<div class="task"><span class="dot green"></span><div class="detail"><b>EMS Platform</b><div class="desc">Primary D / Backup A · L3 · 演練記錄 mock-014</div></div><span class="tag good">已驗證</span></div>
+<div class="task"><span class="dot orange"></span><div class="detail"><b>PCS Controller</b><div class="desc">Primary C / Backup D · L0 · 缺少獨立操作證據</div></div><span class="tag bad">高風險</span></div>
+<div class="task"><span class="dot orange"></span><div class="detail"><b>Battery Testing</b><div class="desc">Primary B / Backup C · L1 · 需要設備操作 SOP</div></div><span class="tag bad">高風險</span></div>
+</div></div>
+<section id="evidenceBox" class="card hidden"><div class="row"><h2 id="evidenceTitle">示意證據</h2><button id="closeEvidence" class="btn">關閉</button></div><pre id="evidenceBody"></pre></section>
+<footer>AI Team Working Model · Offline demonstration only · No real API, LLM, Git access, persistence, or equipment control</footer>
+</main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+"use strict";
+var role=document.getElementById("role"), tab="mission", reviewStatus="IN_REVIEW", started=false, submitted=false;
+var evidence={
+ data:"MOCK evidence | source: dataset-manifest/demo-sample-v1 | revision: v1 | status: OBSERVED | NOTE: This data does not exist in a real project.",
+ model:"MOCK evidence | source: tests/mock-021.json | revision: v1 | status: VERIFIED (simulation only) | No real tests were executed.",
+ analysis:"MOCK evidence | source: experiments/mock-021 | revision: v1 | status: HYPOTHESIS | Missing independent dataset and cross-batch verification.",
+ takeover:"MOCK package | code: demo-commit-001 | dataset: demo-sample-v1 | runbook: examples/example-runbook | All references fictional."
+};
+function notify(s){var t=document.getElementById("toast");t.textContent=s;t.style.display="block";setTimeout(function(){t.style.display="none";},2800);}
+function showTab(name){tab=name;document.querySelectorAll(".page").forEach(function(el){el.classList.toggle("hidden",el.id!==name);});document.querySelectorAll("nav button").forEach(function(el){el.classList.toggle("active",el.dataset.tab===name);});document.getElementById("evidenceBox").classList.add("hidden");}
+document.querySelectorAll("nav button").forEach(function(el){el.addEventListener("click",function(){showTab(el.dataset.tab);});});
+document.querySelectorAll("[data-tab-open]").forEach(function(el){el.addEventListener("click",function(){showTab(el.dataset.tabOpen);});});
+document.querySelectorAll("[data-evidence]").forEach(function(el){el.addEventListener("click",function(){var id=el.dataset.evidence;document.getElementById("evidenceTitle").textContent="證據檢視 / "+id;document.getElementById("evidenceBody").textContent=evidence[id];document.getElementById("evidenceBox").classList.remove("hidden");document.getElementById("evidenceBox").scrollIntoView({behavior:"smooth",block:"nearest"});});});
+document.getElementById("closeEvidence").addEventListener("click",function(){document.getElementById("evidenceBox").classList.add("hidden");});
+document.getElementById("addComment").addEventListener("click",function(){var x=document.getElementById("comment");var c=x.value.trim();if(!c){notify("請先輸入評論");return;}var e=document.createElement("div");e.className="review-thread";var b=document.createElement("b");b.textContent=role.options[role.selectedIndex].text.split(" / ")[0]+"：";e.appendChild(b);e.appendChild(document.createTextNode(c));document.getElementById("threads").appendChild(e);x.value="";notify("已加入本次頁面的模擬評論");});
+document.getElementById("approve").addEventListener("click",function(){if(role.value!=="primary"){notify("示意權限：只有 Primary 可核准此提案");return;}reviewStatus="APPROVED (DEMO)";document.getElementById("reviewStatus").textContent=reviewStatus;document.getElementById("reviewStatus").className="tag good";document.getElementById("decisionNote").textContent="已在頁面記憶體中模擬核准；沒有實際後端審計或模型任務啟動。";notify("模擬核准完成");});
+document.getElementById("reject").addEventListener("click",function(){if(role.value!=="primary"&&role.value!=="reviewer"){notify("僅 Primary / Reviewer 可提出模擬退回決策");return;}reviewStatus="REQUEST_CHANGES (DEMO)";document.getElementById("reviewStatus").textContent=reviewStatus;document.getElementById("reviewStatus").className="tag bad";notify("已模擬退回待補證據");});
+document.getElementById("startTakeover").addEventListener("click",function(){if(role.value!=="backup"){notify("請切換為 Backup 角色開始演練");return;}started=true;submitted=false;document.getElementById("takeoverState").textContent="演練已在此頁啟動（模擬），請輸入完成步驟與證據；Primary 不介入。";document.getElementById("submitTakeover").disabled=false;document.getElementById("reviewTakeover").disabled=true;notify("模擬 Takeover 開始");});
+document.getElementById("submitTakeover").addEventListener("click",function(){if(!started||role.value!=="backup"){notify("請由 Backup 開始演練");return;}if(!document.getElementById("takeoverText").value.trim()){notify("請填寫演練說明");return;}submitted=true;document.getElementById("takeoverState").textContent="已送出模擬演練說明，狀態：待 Reviewer 檢查（沒有實際執行任何測試）。";document.getElementById("submitTakeover").disabled=true;document.getElementById("reviewTakeover").disabled=false;notify("等待模擬審查");});
+document.getElementById("reviewTakeover").addEventListener("click",function(){if(role.value!=="reviewer"||!submitted){notify("請切換 Reviewer，且需有已提交的演練");return;}document.getElementById("takeoverState").textContent="DEMO REVIEWED：已模擬標記通過。正式版必須核對實際沙盒測試、原始證據與審核紀錄；本演示不更新正式 L2/L3。";document.getElementById("reviewTakeover").disabled=true;notify("模擬審查完成（非真實驗證）");});
+role.addEventListener("change",function(){notify("已切換角色視角：此為前端模擬，不具真實身份驗證");});
+showTab("mission");
+})();
+</script>
+</body></html>
