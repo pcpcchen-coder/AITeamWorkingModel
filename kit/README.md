@@ -6,6 +6,7 @@
 |---|---|---|
 | `templates/` | Mission、工作包、證據清單、共讀包、驗證報告、決策請求、人類任務紀錄、週摘要、會議議程、接手包、設定與政策 | [docs/11 §4](../docs/11-toolkit-spec.md) |
 | `checklists/` | 韌體安全關鍵審查、硬體釋出（G3）——起始草稿，需領域專家補充 | [docs/10 §9](../docs/10-domain-profiles-sw-fw-hw.md) |
+| `team/` | 角色矩陣與能力表、團隊協作約定——多人協作的兩份起始文件，不需工具 | [docs/16](../docs/16-team-collaboration.md) |
 | `packs/`、`agent/`、`forge/` | （待實作）領域包、Claude Code 整合、GitHub 整合 | docs/11 §8–§9 |
 
 ## 現在就能用：手動模式
