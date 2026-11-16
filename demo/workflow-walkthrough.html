@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<!-- 離線可用的虛構流程示範。內容與 docs/12、docs/16 對應；不連接任何真實系統、模型或設備。 -->
+<!-- 離線可用的虛構流程示範。內容與 docs/12、docs/16、docs/17 對應；不連接任何真實系統、模型或設備。 -->
 </head>
 <body>
 <title>共讀共推流程示範</title>
@@ -166,6 +166,13 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
 .ladder td button.hu{background:var(--human-bg);color:var(--human);border-color:transparent}
 .ladder td button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:1px}
 .ladder th,.ladder td{padding:6px 5px;border-bottom:0}
+/* per-station prompt and checks */
+.say{border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--surface)}
+.say summary{cursor:pointer;font-weight:700;font-size:14px}
+.say .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.prompt{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--f-body);font-size:13.5px;line-height:1.7;background:var(--sunk);border-radius:6px;padding:12px 14px;margin:10px 0;max-height:320px;overflow:auto}
+.checks{margin:0;padding-left:1.25em;font-size:14px}
+.checks li{margin:3px 0}
 /* team section */
 .team-head{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:24px}
 .team-head p{max-width:70ch}
@@ -190,7 +197,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   <header class="head">
     <div>
       <h1>共讀共推流程示範</h1>
-      <p class="lede">AI 執行開發，人類在平台上共同審查並推進進度。按「下一步」跟著一個橫跨軟體、韌體、硬體的案例走完一輪；在標示可操作的站點，你可以自己做決定。往下還有多人協作的三個小工具。</p>
+      <p class="lede">AI 執行開發，人類在平台上共同審查並推進進度。按「下一步」跟著一個橫跨軟體、韌體、硬體的案例走完一輪；在標示可操作的站點，你可以自己做決定。每一站都附上可以直接交給 AI 的話，以及人要確認的事；往下還有多人協作的三個小工具。</p>
       <span class="note">示範用虛構案例：專案、人員、數值、指令輸出皆為設計示意，非真實結果；aitw 工具尚未實作</span>
     </div>
     <div>
@@ -280,7 +287,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   </section>
 
   <footer class="foot">
-    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）、docs/16（多人協作）。本頁不連接任何真實系統、模型或設備。
+    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）、docs/16（多人協作）、docs/17（十三站操作細則與 prompt 範例）。本頁不連接任何真實系統、模型或設備。
   </footer>
 </div>
 
@@ -458,6 +465,40 @@ function boardOf(i){var s=STEPS[i], b=typeof s.board==="function"?s.board():s.bo
   if(i===2) b.decide=[f().mr+" "+f().id(2)+"　Plan：六個工作包與驗收條件"];
   return b}
 
+/* ---------- per-station prompt (what the human says to the AI) and human checks ---------- */
+var EXTRA=[
+{p:"我要開一個新任務，請用訪談的方式幫我把目標講清楚，再起草任務目標檔。\n\n請一次只問我一個問題：什麼可量測的結果算成功、哪些事不做、哪些動作必須由人執行、你可以自主做到哪、預算與期限、誰是備援。\n\n規則：\n- 你只問問題和整理，不替我決定目標或成功標準。\n- 我沒回答的欄位留空，標示「待主責決定」。\n- 問完後依樣板起草，開 {MR}，不要合併。\n- 最後列出你認為我還沒想清楚的三個地方。",
+ c:["成功定義可量測，並寫明要驗證到哪一階","「不做什麼」「必須由人做什麼」不是空白","沒有 AI 自己補上的目標或數字"]},
+{p:"請為任務 M-001 擬計畫：把目標拆成工作包。這一步只規劃，不要開始實作。\n\n每個工作包要有：領域、執行者、關卡等級、允許變更的路徑、驗收條件（每條附可執行的驗證方式與驗證到第幾階）、相依。\n\n要求：\n- 每個工作包小到 30 分鐘內審得完。\n- 需要實機確認的事，另開由人執行的工作包；燒錄、量測、送板一律由人做。\n- 你不確定怎麼拆的地方，列成選項問我，不要自己選。\n\n回報：一覽表、你最沒把握的三條驗收條件、需要我決定的事。開 Plan {MR}，不要合併。",
+ c:["每個工作包都有可判定通過與否的驗收條件","實機驗證另開了由人執行的工作包"]},
+{opt:true,p:"請以審查者的身份檢查這份計畫。你沒有參與撰寫。\n\n請找出：\n- 無法判定通過與否的驗收條件\n- 只測正常情況的驗收條件\n- 把實機行為寫成可由主機端測試驗證的地方\n- 範圍過寬或彼此重疊的工作包\n\n只列問題與所在檔案行號，不要修改任何檔案。",
+ c:["驗收條件涵蓋邊界與異常，不只正常情況","只到模擬的項目有對應的人類任務","總審查量在自己與團隊的容量之內"]},
+{p:"請執行 WP-002：上拉電阻值的最壞情況計算與模擬。\n\n【目的】我要知道改上拉電阻能不能讓全量程誤差落在目標內，才能決定樣板怎麼改。\n【範圍】只能改 hw/calc、hw/sim、類比介面契約。需要動其他地方就停下來問我。\n【作法】計算寫成可重跑的腳本；規格書數值附文件名、版次、頁碼；找不到的寫 UNKNOWN，不要估一個數字補上。每個驗證指令的輸出存檔並登錄。你產生的證據最高標 OBSERVED。\n【停下來問我】要在候選值之間取捨；驗收條件達不到；同一問題試三輪仍失敗。\n【不要做】改驗收條件、刪改測試、合併、任何設備操作。\n【完成後】開 Draft {MR}，回報：做了什麼、沒做什麼、每條主張的標籤與證據、未驗證的範圍、需要我決定的事。",
+ c:["AI 有停在該停的地方（開了決策請求，而不是自己選）","回報裡有「沒做什麼」與「未驗證的範圍」，不是只報喜"]},
+{p:"在我決定 DR-001 之前，請補上：選項 B 在 60°C 的解析度餘裕是多少、依據是哪一筆證據；兩個選項各依賴哪些尚未驗證的假設。沒有依據的地方寫 UNKNOWN，不要推估。\n\n（決定之後）\nDR-001 我已在 {MR} 留言決定。請把決定、我的理由與留言連結寫進決策檔，不要改寫我的理由；然後依決定繼續，並把介面契約的變更列入必看清單。被否決的選項保留在紀錄中。",
+ c:["選項之間的差異是實質的，不是湊出來的","我的理由留在 {MR} 上，不是只回一個字母"]},
+{p:"你是獨立驗證者，不是作者。請驗證這個 {MR}。\n\n不要因為作者的說明而相信結論，請自己看程式、測試與證據。\n- 在乾淨的工作區，依主幹上的驗證指令重跑。\n- 逐條核對：證據是否真的支持這句主張？標籤是否過高？\n- 找出驗收條件沒涵蓋到的風險；檢查測試是否被刪改或跳過。\n- 列出只能在實機確認的項目。\n\n不可以修改產品程式或測試，只能寫驗證報告。你的報告不構成核准。",
+ c:["驗證者是另一個對話，不是寫程式的那個","共讀包沒有淡化驗證者的發現"]},
+{p:"我是這個 {MR} 的備援審查者，有 20 分鐘。請帶我讀。\n\n1. 先不要給結論。我會先寫下我預期這個變更怎麼做。\n2. 依必看清單一項一項帶我看，指出檔案與行號，說明它為什麼在清單上。\n3. 我問問題時，回答要附來源；找不到依據就說不知道。\n4. 最後出挑戰題考我，不要先給答案。\n\n不要替我按核准，不要修改這個分支。把我未解決的問題整理成留言草稿，由我自己送出。",
+ c:["必看清單逐項看過，不是只讀摘要","我能用自己的話說出這次變更最大的風險"]},
+{opt:true,p:"請對這個 {MR} 做合併前自查：變更是否都在範圍內、驗收條件是否與主幹一致、證據是否針對最新版本、決策請求是否都有人回覆、核准者是否符合規則。\n\n逐項列出通過或未通過與依據。只讀取，不要修改。找不到資料的項目寫「無法確認」，不要假設通過。你的自查不代表核准。",
+ c:["核准是在最後一次提交之後","核准者不是 AI 的帳號，也不是 {MR} 作者","跨領域變更：每個領域的負責人都核准了"]},
+{p:"請執行 WP-003：韌體改用查表內插換算溫度。\n\n【範圍】只能改感測器模組、它的測試與工具。通訊介面不在範圍內。\n【韌體特有的要求】\n- 查表由介面契約以腳本產生，不要手寫數值。\n- 測試要涵蓋：表格兩端、範圍外的輸入、區段交界。\n- 提供 Flash／RAM 用量與上一版的差異。\n- 列出只能在實機確認的項目，不要用主機端結果去推論。\n【絕對不要做】任何燒錄、除錯器、串列埠或儀器操作。需要實機結果時，寫成給人執行的工作包建議，並停下來告訴我。",
+ c:["回報中有「只能在實機確認的項目」","驗證者的風險發現有完整呈現"]},
+{p:"這個 {MR} 我要求修改，請返工。這是第 1 次返工（上限 3 次）。\n\n【要改的事】感測器斷線與短路時必須回報故障，不可回傳看似合理的溫度。\n【注意】這需要新增驗收條件，也可能要動通訊介面，兩件都不是你能自己決定的。請先開決策請求列出選項與影響，等我決定後再動手。\n【紀錄】保留原本的提交與失敗紀錄；程式改過後，舊的證據不可沿用；產生第 2 版共讀包並列出差異。",
+ c:["我的要求具體可驗收，不是「再改好一點」","驗收條件過了，不代表風險都處理了"]},
+{p:"DR-002 我選 B。請：\n1. 在 WP-003 新增驗收條件：「斷線與短路時回報故障碼，不回傳溫度值」，並註明是依 DR-002 新增。\n2. WP-003 只做韌體內部的偵測與錯誤碼，不要動通訊介面。\n3. 另外起草 WP-007（訊框加故障旗標、上位機處理），放進新的 Plan {MR}，不要混在這個 {MR} 裡。它會動到介面契約，請標為跨領域，並列出需要哪些負責人核准。\n4. 提醒我：WP-004 現在相依於 WP-007。",
+ c:["新增的驗收條件沒有被寫得比較寬","新工作包有進計畫審查，沒有悄悄併入"]},
+{p:"請為 WP-005 準備給人執行的程序書與空白紀錄表。執行者是合格人員；你不會、也不可以操作任何設備。\n\n必須包含：目的與對應的驗收條件、待測物與版本、要用的韌體檔（必須是 CI 由已核准版本產生的，附雜湊）、設備與接線、逐步操作、每一步的預期範圍、中止條件、要記錄的欄位。\n你不確定的操作細節標「待執行者確認」，不要編數字。本程序不取代實驗室安全 SOP。\n\n（量測之後）\n請分析紀錄：資料標 OBSERVED；紀錄中的偏離列入必看清單，並寫明哪些結論因此不能成立；沒量到的範圍不要外推；不要修改人填寫的紀錄。",
+ c:["程序書有中止條件，且經合格人員審過","偏離都記下來了（偏離不是過失，隱瞞才是）","簽認時寫明適用範圍"]},
+{p:"請準備本週團隊會的議程，分五段：逾期與卡住、跨任務碰撞、共用資源、審查負荷、調整一條規則。\n\n資料只用 repo 與 {MR} 上的事實，每一項附連結。沒有資料的段落寫「無」，不要湊內容。不要寫進度百分比，只列已接受的工作包數與總數。\n\n（會議之後）\n請依我給的結論起草會議紀錄並開 {MR}。只記錄我給你的結論；會中的決定逐一列出「誰需要在哪個 {MR} 留言才生效」。",
+ c:["逾期的決策都指定了處理人","實體任務排到了具體的人與日期","這週調整了一條規則並記下原因"]}
+];
+function fill(t){return t.split("{MR}").join(f().mr)}
+function extra(i){var x=EXTRA[i]; if(!x)return "";
+  return '<details class="say" open><summary>'+(x.opt?"選用　":"")+'你對 AI 說的話（範例）</summary><pre class="prompt" id="prompt'+i+'">'+esc(fill(x.p))+'</pre><button type="button" class="btn" data-copy="prompt'+i+'">複製這段話</button><p class="hint">可直接貼給任一 Coding Agent。示範頁上的指令工具尚未實作，這段白話文字現在就能用；範例未經實測，請依實際效果調整。</p></details>'
+   +'<div><div class="cap">這一站人要確認</div><ul class="checks">'+x.c.map(function(t){return '<li>'+esc(fill(t))+'</li>'}).join("")+'</ul></div>'}
+
 /* ---------- track ---------- */
 var track=document.getElementById("track"), LROW={h:1,a:2,c:3};
 function buildTrack(){
@@ -480,7 +521,7 @@ var LANE={h:["h","人類"],a:["a","AI Agent"],c:["c","CI 與 Gate"]}, prevCards=
 function renderScene(){
   var s=STEPS[cur], tool=typeof s.tool==="function"?s.tool():s.tool;
   document.getElementById("scene").innerHTML='<div class="step-head"><span class="chip '+LANE[s.lane][0]+'">'+LANE[s.lane][1]+'</span><h2><span class="mono">'+(cur+1)+'</span>　'+s.t+'</h2>'+(s.act?'<span class="pill">可操作</span>':"")+'</div>'
-   +'<p class="story">'+s.story+'</p><p class="toolline">'+esc(s.who)+'　·　<span class="mono">'+esc(tool)+'</span></p><div class="blocks">'+s.body()+'</div>';
+   +'<p class="story">'+s.story+'</p><p class="toolline">'+esc(s.who)+'　·　<span class="mono">'+esc(tool)+'</span></p><div class="blocks">'+s.body()+extra(cur)+'</div>';
 }
 function renderBoard(){
   var b=boardOf(cur), cols=[["decide","等我決定"],["hands","等我動手"],["ai","AI 進行中"],["blocked","卡住"]], seen={};
@@ -518,6 +559,10 @@ document.getElementById("play").onclick=function(){
 track.addEventListener("click",function(e){var b=e.target.closest(".st");if(b){stop();go(+b.dataset.i)}});
 document.addEventListener("keydown",function(e){if(e.target.closest("select,input,textarea"))return;if(e.key==="ArrowRight"){stop();go(cur+1)}if(e.key==="ArrowLeft"){stop();go(cur-1)}});
 document.getElementById("scene").addEventListener("click",function(e){
+  var cp=e.target.closest("[data-copy]");
+  if(cp){var pre=document.getElementById(cp.dataset.copy), done=function(){cp.textContent="已複製";setTimeout(function(){cp.textContent="複製這段話"},1600)},
+      sel=function(){var r=document.createRange();r.selectNodeContents(pre);var s=window.getSelection();s.removeAllRanges();s.addRange(r);cp.textContent="已選取，請按複製"};
+    try{navigator.clipboard.writeText(pre.textContent).then(done,sel)}catch(err){sel()} return}
   var o=e.target.closest("[data-dr]"); if(o){stop();st.dr1=o.dataset.dr;pull=st.dr1;renderScene();return}
   var a=e.target.closest("[data-ap]"); if(a){stop();st.appr[a.dataset.ap]=!st.appr[a.dataset.ap];renderScene();renderBoard();return}
   var r=e.target.closest("[data-rv]"); if(r){stop();st.rv=r.dataset.rv;renderScene()}
