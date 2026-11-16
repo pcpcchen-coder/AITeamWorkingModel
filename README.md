@@ -64,7 +64,7 @@ Human Backup ── challenges / takeover┘             │
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
 | [互動 Demo：Mission Control](demo/mission-control.html) | 單檔 HTML、模擬資料、離線可用 |
-| [互動 Demo：工作流程案例示範](demo/workflow-walkthrough.html) | **v0.4** 一步步播放虛構案例：三方接力、看板變化、Gate 模擬器；每站附交付 AI 的 prompt 範例與人要確認的事；多人協作的審查指派、分歧裁決、出錯分類；可切換 GitLab／GitHub 用語 |
+| [互動 Demo：工作流程案例示範](demo/workflow-walkthrough.html) | **v0.4** 一步步播放虛構案例：三方接力、看板變化、Gate 模擬器；每站附交付 AI 的 prompt 範例、負責的 Agent 與人要確認的事；軟韌硬交付範例選擇器；四個 Agent 的分工；多人協作的審查指派、分歧裁決、出錯分類；可切換 GitLab／GitHub 用語 |
 
 ## v0.3：先讓流程能操作（Git-native Operating Kit）
 
