@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<!-- 離線可用的虛構流程示範。內容與 docs/12 對應；不連接任何真實系統、模型或設備。 -->
+<!-- 離線可用的虛構流程示範。內容與 docs/12、docs/16 對應；不連接任何真實系統、模型或設備。 -->
 </head>
 <body>
 <title>共讀共推流程示範</title>
@@ -166,6 +166,21 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
 .ladder td button.hu{background:var(--human-bg);color:var(--human);border-color:transparent}
 .ladder td button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:1px}
 .ladder th,.ladder td{padding:6px 5px;border-bottom:0}
+/* team section */
+.team-head{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:24px}
+.team-head p{max-width:70ch}
+.row{display:flex;flex-wrap:wrap;gap:12px 16px}
+.row .field{flex:1 1 150px;min-width:0}
+.row select{width:100%}
+.hl td{background:var(--sunk);font-weight:700}
+.assign{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.assign li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sunk)}
+.assign .who{font-family:var(--f-display);font-weight:700;font-size:17px}
+.assign .why{grid-column:2;font-size:13.5px;color:var(--muted)}
+.rolechips{display:flex;flex-wrap:wrap;gap:6px}
+.sub{border-top:1px solid var(--line);margin-top:20px;padding-top:18px}
+.sub h3{margin-bottom:4px}
+.verdict{font-family:var(--f-display);font-weight:700;font-size:16px}
 .foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
 .foot a{color:var(--accent)}
 @media (max-width:860px){.stage,.two{grid-template-columns:minmax(0,1fr)} h1{font-size:25px}}
@@ -175,7 +190,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   <header class="head">
     <div>
       <h1>共讀共推流程示範</h1>
-      <p class="lede">AI 執行開發，人類在平台上共同審查並推進進度。按「下一步」跟著一個橫跨軟體、韌體、硬體的案例走完一輪；在標示可操作的站點，你可以自己做決定。</p>
+      <p class="lede">AI 執行開發，人類在平台上共同審查並推進進度。按「下一步」跟著一個橫跨軟體、韌體、硬體的案例走完一輪；在標示可操作的站點，你可以自己做決定。往下還有多人協作的三個小工具。</p>
       <span class="note">示範用虛構案例：專案、人員、數值、指令輸出皆為設計示意，非真實結果；aitw 工具尚未實作</span>
     </div>
     <div>
@@ -203,6 +218,43 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
     <aside class="panel board" id="board" aria-label="看板"></aside>
   </section>
 
+  <section class="team-head">
+    <h2>多位成員一起工作時</h2>
+    <p class="muted">上面的案例只有一個任務。四個人、三個任務同時進行時，問題變成：誰審誰的產出、要求互相矛盾時誰決定、出錯怎麼算。團隊的產能上限是人的審查容量，不是 AI 的產能。</p>
+  </section>
+
+  <section class="two" id="team">
+    <div class="panel">
+      <h2>這件該由誰審</h2>
+      <p class="muted small" style="margin-top:4px">主責審自己任務的 AI 產出，是把關自己的產出，不算獨立審查。選一個情況，看規則怎麼排人。</p>
+      <div class="tablewrap" style="margin-top:12px"><table id="tmMatrix"></table></div>
+      <div class="bench-controls">
+        <div class="row">
+          <div class="field"><label for="tmM">哪個任務的變更</label><select id="tmM"></select></div>
+          <div class="field"><label for="tmD">動到哪個領域</label><select id="tmD"></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="tmG">關卡等級</label><select id="tmG"><option value="G1">G1　一般變更</option><option value="G2" selected>G2　架構、介面、安全</option><option value="G3">G3　不可逆動作</option></select></div>
+          <div class="field"><label for="tmR">本週輪值審查者</label><select id="tmR"></select></div>
+        </div>
+        <div class="field"><label>每人目前待審件數（點選增加，上限 3）</label><div class="toggles" id="tmLoad"></div></div>
+        <div id="tmOut"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>要求互相矛盾時</h2>
+      <p class="muted small" style="margin-top:4px">人與人之間的分歧不交給 AI 調解。選一種爭議，看 AI 怎麼做、由誰決定。</p>
+      <div class="toggles" id="dsPick" style="margin-top:12px"></div>
+      <div id="dsOut" style="margin-top:12px;display:flex;flex-direction:column;gap:10px"></div>
+      <div class="sub">
+        <h3>出錯了，先分類再處理</h3>
+        <p class="muted small">預設不究責個人，但界線清楚。選一個情況。</p>
+        <div class="toggles" id="erPick" style="margin-top:10px"></div>
+        <div id="erOut" style="margin-top:12px;display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="two">
     <div class="panel">
       <h2>Gate 模擬器</h2>
@@ -228,7 +280,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   </section>
 
   <footer class="foot">
-    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）。本頁不連接任何真實系統、模型或設備。
+    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）、docs/16（多人協作）。本頁不連接任何真實系統、模型或設備。
   </footer>
 </div>
 
@@ -523,7 +575,78 @@ function renderLadder(){
 }
 document.getElementById("ladder").addEventListener("click",function(e){var b=e.target.closest("button");if(b){lsel=[+b.dataset.r,+b.dataset.c];renderLadder()}});
 
-buildTrack(); setForge("gitlab"); renderLadder();
+/* ---------- team: who reviews ---------- */
+var PPL=["甲","乙","丙","丁"], LIMIT=3;
+var MIS={A:{n:"M-A 低溫量測準確度",o:"甲",b:"乙"},B:{n:"M-B 上位機資料管線",o:"乙",b:"丙"},C:{n:"M-C 通訊協定改版",o:"丙",b:"丁"}};
+var DOM={hw:{n:"硬體",s:"甲",d:"丁"},fw:{n:"韌體",s:"丙",d:"甲"},sw:{n:"軟體",s:"乙",d:"丙"},icd:{n:"介面契約",s:"丙",d:"乙"}};
+var tm={m:"A",d:"fw",g:"G2",r:"丁",load:{"甲":1,"乙":0,"丙":2,"丁":0}};
+function opts(el,pairs,val){el.innerHTML=pairs.map(function(p){return '<option value="'+p[0]+'"'+(p[0]===val?" selected":"")+'>'+p[1]+'</option>'}).join("")}
+function full(p){return tm.load[p]>=LIMIT}
+function assign(){
+  var M=MIS[tm.m], D=DOM[tm.d], o=M.o, L=[], N=[], blocked=false, dom=null;
+  L.push({p:o,role:"當責審查",why:"任務主責，AI 的產出視同他的產出"});
+  if(D.s===o){N.push("主責"+o+"本人就是"+D.n+"負責人，領域把關由他自己負責。")}
+  else if(!full(D.s)){dom=D.s}
+  else{N.push(D.n+"負責人"+D.s+"已達待審上限 "+LIMIT+" 件。");
+    if(D.d!==o&&!full(D.d)){dom=D.d;N.push("改由代理人"+D.d+"審。")}
+    else{blocked=true;N.push("代理人"+D.d+(D.d===o?"是本任務主責，不能代審。":"也已達上限。"))}}
+  if(dom)L.push({p:dom,role:"領域負責人"+(dom===D.d?"（代理）":""),why:"動到"+D.n+"，不論關卡等級都要過他"});
+  if(tm.g==="G2"){
+    if(dom){L[L.length-1].role+="・獨立審查";L[L.length-1].why+="；同時擔任獨立審查者"}
+    else{var c=[], seen={};
+      [[D.s===o?D.d:null,"領域代理人"],[M.b,"任務備援，順便累積接手能力"],[tm.r,"本週輪值審查者，讓知識擴散到平常不相關的人"]].forEach(function(x){if(x[0]&&x[0]!==o&&!seen[x[0]]){seen[x[0]]=1;c.push(x)}});
+      var pick=null;c.forEach(function(x){if(pick)return;if(full(x[0]))N.push(x[0]+"已達待審上限，跳過。");else pick=x});
+      if(pick)L.push({p:pick[0],role:"獨立審查",why:pick[1]});else{blocked=true;N.push("排不出非主責的審查者。")}}}
+  if(tm.g==="G3"){
+    if(dom){L[L.length-1].role+="・合格審查";L[L.length-1].why+="；不可逆動作的第二位核准者"}
+    else{var q=(D.s===o&&!full(D.d))?D.d:null;
+      if(q)L.push({p:q,role:"合格審查",why:D.n+"代理人；不可逆動作的第二位核准者"});else{blocked=true;N.push("沒有可用的第二位合格審查者。")}}
+    N.push("不可逆動作：兩人核准，採設計審查會議並逐項填檢查表。")}
+  if(tm.g==="G1"&&!dom&&D.s===o)N.push("G1 且未動到別人的領域：主責當責審查即可。");
+  return {L:L,N:N,blocked:blocked}}
+function renderTeam(){
+  opts(document.getElementById("tmM"),Object.keys(MIS).map(function(k){return [k,MIS[k].n+"（主責"+MIS[k].o+"）"]}),tm.m);
+  opts(document.getElementById("tmD"),Object.keys(DOM).map(function(k){return [k,DOM[k].n+"（負責人"+DOM[k].s+"）"]}),tm.d);
+  opts(document.getElementById("tmR"),PPL.map(function(p){return [p,p]}),tm.r);
+  document.getElementById("tmMatrix").innerHTML='<thead><tr><th>任務</th><th>主責</th><th>備援</th></tr></thead><tbody>'
+   +Object.keys(MIS).map(function(k){var m=MIS[k];return '<tr class="'+(k===tm.m?"hl":"")+'"><td>'+m.n+'</td><td>'+m.o+'</td><td>'+m.b+'</td></tr>'}).join("")
+   +'</tbody><thead><tr><th>領域</th><th>負責人</th><th>代理人</th></tr></thead><tbody>'
+   +Object.keys(DOM).map(function(k){var d=DOM[k];return '<tr class="'+(k===tm.d?"hl":"")+'"><td>'+d.n+'</td><td>'+d.s+'</td><td>'+d.d+'</td></tr>'}).join("")+'</tbody>';
+  document.getElementById("tmLoad").innerHTML=PPL.map(function(p){return '<button type="button" class="tgl" data-p="'+p+'" aria-pressed="'+full(p)+'">'+p+'　'+tm.load[p]+' / '+LIMIT+'</button>'}).join("");
+  var r=assign();
+  document.getElementById("tmOut").innerHTML='<div class="cap">需要核准的人</div><ul class="assign">'+r.L.map(function(x){return '<li><span class="who">'+x.p+'</span><span class="rolechips"><span class="pill">'+x.role+'</span></span><span class="why">'+x.why+'</span></li>'}).join("")+'</ul>'
+   +(r.N.length?'<div class="callout" style="margin-top:10px">'+r.N.join("<br>")+'</div>':"")
+   +(r.blocked?'<div class="callout warn" style="margin-top:10px"><b>這件目前排不出人。</b>依團隊約定：減少同時進行的任務或調整分工，不是請人加班，也不是放寬審查。</div>':"");
+}
+["tmM","tmD","tmG","tmR"].forEach(function(id){document.getElementById(id).onchange=function(){tm[{tmM:"m",tmD:"d",tmG:"g",tmR:"r"}[id]]=this.value;renderTeam()}});
+document.getElementById("tmLoad").addEventListener("click",function(e){var b=e.target.closest("[data-p]");if(b){var p=b.dataset.p;tm.load[p]=(tm.load[p]+1)%(LIMIT+1);renderTeam()}});
+
+/* ---------- team: disputes and errors ---------- */
+var DISP=[
+ ["設計方向","備援乙認為應該換演算法；主責甲想先調參數。","該任務主責","他人的異議必須記錄在決策紀錄上，供日後接手的人參考。"],
+ ["領域內的作法","M-A 的 AI 想改韌體驅動的錯誤處理方式；韌體負責人丙不同意。","該領域負責人","主責可提請主管裁決。"],
+ ["介面契約","M-B 要在訊框加欄位；M-C 要改欄位的縮放，兩者互相影響。","介面兩側的領域負責人共同決定","無法一致時，由主管或指定的技術負責人裁決。"],
+ ["安全","主責想縮短保護延遲來通過測試；安全審查者認為有風險。","合格的安全審查者，有否決權","主責不能推翻，只能向上提請；提請期間維持阻擋。"],
+ ["搶共用資源","M-A 與 M-C 同一週都要用溫箱與同一位合格執行者。","主管，依任務優先序","協調人先在每週團隊會嘗試排開；任務優先序是一條線，沒有並列。"]];
+var ERRS=[
+ ["錯在必看清單之外","錯誤出在必看清單沒列到的檔案，CI 也沒有對應測試。","A　流程缺口","修規則、補測試、補檢查表。不歸咎審查者。","good"],
+ ["清單內卻漏看","必看清單列了這個函式，審查者核准了，事後發現端點算錯。","B　審查疏漏","先看當時的負荷與資格是否相稱（是否超過待審上限、時間是否不足），再做輔導與案例回顧。",""],
+ ["跳過關卡","沒經過啟動核准就先燒錄；量測沒達到條件卻沒有記錄。","C　繞過流程","這是唯一以個人行為問責的類別。","warn"],
+ ["主動回報偏離","量測者主動回報「溫箱只到 -18°C，沒達到程序要求」。","不是過失","照實回報是正確行為，永不處罰。處罰回報只會讓下一次沒有人回報。","good"]];
+var ds=0, er=0;
+function pick(el,list,sel){el.innerHTML=list.map(function(x,i){return '<button type="button" class="tgl" data-i="'+i+'" aria-pressed="'+(i===sel)+'">'+x[0]+'</button>'}).join("")}
+function renderDisp(){
+  pick(document.getElementById("dsPick"),DISP,ds); var x=DISP[ds];
+  document.getElementById("dsOut").innerHTML='<div class="callout">'+x[1]+'</div>'
+   +'<div><div class="cap">AI 的動作</div><ol class="relay"><li><span class="chip a">1</span><div>停下與衝突相關的部分；不相依的工作繼續。</div></li><li><span class="chip a">2</span><div>開決策請求，寫明誰要求了什麼、哪裡矛盾、各自的影響，同時通知雙方。</div></li><li><span class="chip a">3</span><div>等人決定。不選邊、不折衷，也不以較新的指示自動覆蓋較舊的。</div></li></ol></div>'
+   +'<div><div class="cap">由誰決定</div><p class="verdict">'+x[2]+'</p><p class="small muted">'+x[3]+'</p></div>'}
+function renderErr(){
+  pick(document.getElementById("erPick"),ERRS,er); var x=ERRS[er];
+  document.getElementById("erOut").innerHTML='<div class="callout">'+x[1]+'</div><div class="callout '+x[4]+'"><span class="verdict">'+x[2]+'</span><br>'+x[3]+'</div>'}
+document.getElementById("dsPick").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){ds=+b.dataset.i;renderDisp()}});
+document.getElementById("erPick").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){er=+b.dataset.i;renderErr()}});
+
+buildTrack(); setForge("gitlab"); renderLadder(); renderTeam(); renderDisp(); renderErr();
 window.addEventListener("resize",drawLines);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawLines);
 })();
