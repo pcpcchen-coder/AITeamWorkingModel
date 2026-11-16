@@ -56,11 +56,13 @@ Human Backup ── challenges / takeover┘             │
 | [13 開發交付包](docs/13-opus-handoff.md) | **v0.3** 實作工單 K0–K8、不變量、啟動指令、待確認事項 |
 | [14 GitLab 執行方式](docs/14-gitlab-profile.md) | **v0.4** AI 開發 × GitLab 共同 review：平台對照、依授權等級的強制方式、漸進導入階梯 |
 | [16 多人協作設計](docs/16-team-collaboration.md) | **v0.5（主軸）** 多位成員與 AI 的分工、並行協調、誰審誰、指示衝突、人的成長、責任與接受度 |
+| [17 十三站操作細則](docs/17-station-guide.md) | **v0.6** 示範頁 13 站逐站展開：人做什麼、對 AI 說什麼（可直接使用的 prompt 範例）、AI 交回什麼、人要確認什麼 |
+| [交付 AI 的 Prompt](prompts/handoff-prompts.md) | **v0.6** 交付七要素與好壞對照、寫進 `AGENTS.md` 的常駐規則、回報格式、出狀況與多人情境的 prompt |
 | [Kit 樣板與檢查表](kit/README.md) | 現在就能用的手動模式樣板；含角色矩陣與團隊協作約定 |
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
 | [互動 Demo：Mission Control](demo/mission-control.html) | 單檔 HTML、模擬資料、離線可用 |
-| [互動 Demo：工作流程案例示範](demo/workflow-walkthrough.html) | **v0.4** 一步步播放虛構案例：三方接力、看板變化、Gate 模擬器；多人協作的審查指派、分歧裁決、出錯分類；可切換 GitLab／GitHub 用語 |
+| [互動 Demo：工作流程案例示範](demo/workflow-walkthrough.html) | **v0.4** 一步步播放虛構案例：三方接力、看板變化、Gate 模擬器；每站附交付 AI 的 prompt 範例與人要確認的事；多人協作的審查指派、分歧裁決、出錯分類；可切換 GitLab／GitHub 用語 |
 
 ## v0.3：先讓流程能操作（Git-native Operating Kit）
 

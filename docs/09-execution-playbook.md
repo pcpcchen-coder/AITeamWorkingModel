@@ -284,6 +284,8 @@ R 執行 · A 當責 · C 諮詢 · I 知會
 
 本文以單一任務為單位。多位成員同時進行多個任務時的角色矩陣、並行協調、審查指派、指示衝突、人的成長與責任，見 [16 多人協作設計](16-team-collaboration.md)。
 
+每一步實際怎麼做、對 AI 說什麼，見 [17 十三站操作細則](17-station-guide.md) 與 [交付 AI 的 Prompt](../prompts/handoff-prompts.md)。
+
 ## 12. Phase 0：工具完成前的手動模式
 
 不必等 `aitw`。今天就能用 [`kit/templates/`](../kit/templates/) 的樣板 + 任一 Coding Agent 運作：

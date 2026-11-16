@@ -27,7 +27,7 @@ Read \`README.md\`, \`docs/01-operating-model.md\`, \`docs/02-workflow-and-takeo
 
 ## Working directory contract
 - \`docs/\`: operating model, workflows, architecture, API, governance, rollout and backlog.
-- \`prompts/\`: approved agent contracts and output schemas.
+- \`prompts/\`: approved agent contracts and output schemas; example prompts humans use to hand work to an agent (\`handoff-prompts.md\`).
 - \`demo/\`: **offline / fictitious** interface demonstrations.
 - \`kit/\`: Operating Kit sources — templates, checklists, and (future) domain packs, agent and forge integrations.
 - \`work/\`: this repository's own missions and work packages (the kit is developed with its own process).
