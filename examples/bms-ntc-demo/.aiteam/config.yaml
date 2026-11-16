@@ -1,0 +1,21 @@
+# .aiteam/config.yaml — 虛構資料（fictional）；身份對應 docs/12 §2
+# 人類專屬檔案：Agent 身份不可修改（docs/11 §5.1）
+project: bms-ntc-demo
+forge: github
+default_branch: main
+people:
+  - {handle: primary-a,  roles: [primary],  domains: [hw, fw]}
+  - {handle: backup-b,   roles: [backup],   domains: [sw]}
+  - {handle: reviewer-c, roles: [reviewer], domains: [hw, fw], qualifications: [bench_low_voltage, thermal_chamber]}
+agents:
+  identities: [aiteam-bot]
+packs: [sw, fw, hw]
+wip:
+  max_in_review_per_person: 3
+  max_open_decisions: 5
+  max_rework: 3
+decision_sla_workdays: {G1: 2, G2: 3}
+cadence:
+  weekly_sync: "Mon 10:00"
+  digest_day: Fri
+  takeover_drill: monthly

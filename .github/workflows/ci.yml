@@ -39,3 +39,12 @@ jobs:
         run: python -m pytest
       - name: aitw lint on test fixture
         run: aitw --repo packages/aitw/tests/fixtures/valid-minimal lint
+      # 以下四步為 WP-001 凍結的驗收指令（AC1、AC3–AC5），文字須與 wp.md 一致
+      - name: "WP-001 AC1: aitw lint on example project"
+        run: aitw --repo examples/bms-ntc-demo lint
+      - name: "WP-001 AC3: example firmware host tests"
+        run: make -C examples/bms-ntc-demo/fw test
+      - name: "WP-001 AC4: example software tests"
+        run: python -m pytest examples/bms-ntc-demo/sw
+      - name: "WP-001 AC5: example hardware worst-case calculation"
+        run: python examples/bms-ntc-demo/hw/calc/ntc_divider_worstcase.py --candidates 10k,22k,33k

@@ -1,0 +1,11 @@
+# 通訊訊框介面契約（ICD）— 虛構資料（fictional）
+# 韌體（編碼端）與上位機（sw/soh_demo/frame.py，解碼端）都以此為正本；sw 有契約測試。
+version: 1
+byte_order: little
+frames:
+  - name: cell_temperature
+    id: "0x310"
+    length: 3
+    fields:
+      - {name: temp_decic, offset: 0, type: int16, unit: degC, scale: 0.1}
+      - {name: status, offset: 2, type: uint8, values: {0: ok}}

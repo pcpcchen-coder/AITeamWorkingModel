@@ -1,0 +1,5 @@
+# 虛構需求（fictional）
+requirements:
+  - {id: REQ-001, text: "-20～60°C 溫度量測誤差 ≤ ±1°C", domain: hw}
+  - {id: REQ-002, text: "韌體以查表內插把 ADC 讀值換算為 0.1°C 單位的溫度", domain: fw}
+  - {id: REQ-003, text: "上位機 SOH 估算在低溫段使用補償後的溫度", domain: sw}

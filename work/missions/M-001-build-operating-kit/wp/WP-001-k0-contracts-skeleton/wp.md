@@ -138,3 +138,4 @@ start_approval: not_required
 
 - 2026-11-13 agent:engineer-sw 由 docs/13 §3 K0 轉寫本 WP；開 Plan PR。
 - 2026-11-16 agent:engineer-sw owner 於對話中核准 Plan 並採納 DR-P2～P14 建議（forge 紀錄待 owner 於 PR #2 留言）；開始 PR 2/3：schema、`aitw lint`、CI、I1／I7／I8 測試（分支 `wp/WP-001-schemas-lint`）。
+- 2026-11-16 agent:engineer-sw 開始 PR 3/3：範例專案 `examples/bms-ntc-demo/`（AC1、AC3–AC5）並加入 CI（分支 `wp/WP-001-example-project`，堆疊於 PR #3）。

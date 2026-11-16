@@ -1,0 +1,21 @@
+# 類比鏈介面契約（ICD）— 虛構資料（fictional）
+# 硬體計算、韌體常數（fw/include/analog_config.h）、韌體查表都以此為正本。
+# 任何變更 = G2 跨領域（hw、fw、sw owner 都要核准；docs/10 §6）。
+version: 1
+ntc:
+  part: "NTC-10K-EXAMPLE（虛構料號）"
+  r25_ohm: 10000
+  beta_k: 3435
+  r25_tolerance_pct: 1.0
+  beta_tolerance_pct: 1.0
+divider:
+  topology: ntc_low_side        # 上拉電阻接參考電壓，NTC 接地；ADC 量中點
+  pullup_ohm: 10000
+  pullup_tolerance_pct: 1.0
+adc:
+  bits: 12
+  error_lsb: 2                  # 虛構的總誤差（含雜訊與非線性）
+  reference: ratiometric        # ADC 參考與分壓電源同源，參考電壓誤差相消
+range_degc:
+  min: -40
+  max: 85
