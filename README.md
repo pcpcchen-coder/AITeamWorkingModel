@@ -55,7 +55,8 @@ Human Backup ── challenges / takeover┘             │
 | [12 操作範例](docs/12-operating-examples.md) | **v0.3** 一個橫跨軟韌硬的虛構 Mission 從頭走到尾 |
 | [13 開發交付包](docs/13-opus-handoff.md) | **v0.3** 實作工單 K0–K8、不變量、啟動指令、待確認事項 |
 | [14 GitLab 執行方式](docs/14-gitlab-profile.md) | **v0.4** AI 開發 × GitLab 共同 review：平台對照、依授權等級的強制方式、漸進導入階梯 |
-| [Kit 樣板與檢查表](kit/README.md) | 現在就能用的手動模式樣板 |
+| [16 多人協作設計](docs/16-team-collaboration.md) | **v0.5（主軸）** 多位成員與 AI 的分工、並行協調、誰審誰、指示衝突、人的成長、責任與接受度 |
+| [Kit 樣板與檢查表](kit/README.md) | 現在就能用的手動模式樣板；含角色矩陣與團隊協作約定 |
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
 | [互動 Demo：Mission Control](demo/mission-control.html) | 單檔 HTML、模擬資料、離線可用 |
@@ -71,6 +72,8 @@ Human Backup ── challenges / takeover┘             │
 - **共推進度**：決策佇列與時限、人類任務接力、方向指示、WIP 上限保護人類注意力。
 
 - **GitLab 與 GitHub 皆可**：單位既有的「AI 開發、GitLab 上 review」案例是首個試點候選，可從 MR 樣板開始漸進導入（[14](docs/14-gitlab-profile.md)）。
+
+**主軸提醒：** 本專案的核心是「多位人類成員與 AI 的協作模式」，工具只是把模式自動化的手段。多人層面的設計見 [16](docs/16-team-collaboration.md)；`docs/15` 保留給日後的快速上手文件。
 
 從 [09](docs/09-execution-playbook.md) 開始讀；想直接看實例讀 [12](docs/12-operating-examples.md) 或開啟 [工作流程案例示範](demo/workflow-walkthrough.html)。實作優先序調整見 [07](docs/07-engineering-backlog.md) 開頭與 [13](docs/13-opus-handoff.md)。
 

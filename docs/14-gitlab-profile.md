@@ -138,6 +138,8 @@
 7. 審查者目前最花時間或最不放心的是什麼？有沒有發生過「合併後才發現 AI 做錯」的情況？
 8. 是否願意作為首個試點，從 §6 的第 1 級開始？
 
+多人協作層面的補充問題（分工、誰審誰、意見分歧、新人養成、出錯處理、顧慮）見 [16 §12](16-team-collaboration.md)。
+
 ## 9. 參考來源（GitLab 官方文件，2026-11-13 讀取）
 
 - 核准設定：<https://docs.gitlab.com/user/project/merge_requests/approvals/settings/>

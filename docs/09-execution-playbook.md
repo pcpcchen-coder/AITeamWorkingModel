@@ -282,6 +282,8 @@ R 執行 · A 當責 · C 諮詢 · I 知會
 | Pair | Primary + Backup | 本文預設；Backup 兼 Reviewer 時，不可審自己參與執行的部分 |
 | Team | 多個 Primary／Backup + 領域 Reviewer | 依領域設 CODEOWNERS；跨領域介面變更需雙方 owner 都核准 |
 
+本文以單一任務為單位。多位成員同時進行多個任務時的角色矩陣、並行協調、審查指派、指示衝突、人的成長與責任，見 [16 多人協作設計](16-team-collaboration.md)。
+
 ## 12. Phase 0：工具完成前的手動模式
 
 不必等 `aitw`。今天就能用 [`kit/templates/`](../kit/templates/) 的樣板 + 任一 Coding Agent 運作：
