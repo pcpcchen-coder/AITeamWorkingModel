@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/review-packet.schema.json",
+  "title": "Review packet (review/packet-rN.md front matter)",
+  "x-doc": "docs/11 §4.3",
+  "type": "object",
+  "properties": {
+    "wp": {
+      "type": "string",
+      "pattern": "^WP-\\d{3,}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "head_sha": {
+      "type": "string",
+      "minLength": 1
+    },
+    "effective_gate": {
+      "enum": [
+        "G0",
+        "G1",
+        "G2",
+        "G3"
+      ]
+    },
+    "review_tier": {
+      "enum": [
+        "R1",
+        "R2",
+        "R3"
+      ]
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^C\\d+$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "enum": [
+              "VERIFIED",
+              "OBSERVED",
+              "HYPOTHESIS",
+              "RECOMMENDATION",
+              "UNKNOWN",
+              "REJECTED"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "ladder": {
+            "anyOf": [
+              {
+                "enum": [
+                  "V1",
+                  "V2",
+                  "V3",
+                  "V4",
+                  "V5"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope_limits": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "label",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "must_read": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lines": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "est_minutes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "path",
+          "reason",
+          "est_minutes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^DR-\\d{3,}$"
+      }
+    },
+    "challenge_question": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unverified": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rollback": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "wp",
+    "revision",
+    "head_sha",
+    "effective_gate",
+    "review_tier",
+    "claims",
+    "must_read",
+    "questions",
+    "challenge_question",
+    "unverified",
+    "rollback"
+  ],
+  "additionalProperties": false
+}

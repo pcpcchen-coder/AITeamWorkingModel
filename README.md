@@ -1,6 +1,6 @@
 # AI Team Working Model — AI-Driven R&D
 
-> **Status:** Architecture & operating-model proposal (v0.4, 2026-11-13). This repository is **not** a deployed AI platform；v0.3 規劃的 `aitw` 工具尚未實作。
+> **Status:** Architecture & operating-model proposal (v0.4, 2026-11-13). This repository is **not** a deployed AI platform；v0.3 規劃的 `aitw` 工具開發中：目前僅有 `aitw lint`（檔案契約檢查，見 [`packages/aitw/`](packages/aitw/)），其餘指令依 [docs/13](docs/13-opus-handoff.md) 的工單陸續實作。
 >
 > **Language:** 繁體中文為主；code / API / schema 保留英文名稱。
 >

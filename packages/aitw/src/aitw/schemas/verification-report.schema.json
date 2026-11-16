@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/verification-report.schema.json",
+  "title": "Validator report (review/verification-rN.md front matter)",
+  "x-doc": "kit/templates/verification-report.md",
+  "type": "object",
+  "properties": {
+    "wp": {
+      "type": "string",
+      "pattern": "^WP-\\d{3,}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "head_sha": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validator": {
+      "type": "string",
+      "minLength": 1
+    },
+    "independent_context": {
+      "type": "boolean"
+    },
+    "verdict": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED"
+      ]
+    },
+    "criteria": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^AC\\d+$"
+      },
+      "additionalProperties": {
+        "enum": [
+          "PASS",
+          "FAIL",
+          "BLOCKED"
+        ]
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^F\\d+$"
+          },
+          "severity": {
+            "enum": [
+              "blocker",
+              "risk",
+              "note"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "in_acceptance_scope": {
+            "type": "boolean"
+          },
+          "suggestion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "severity",
+          "text",
+          "in_acceptance_scope"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "disagreements": {
+      "type": "array"
+    },
+    "only_verifiable_on_hardware": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "wp",
+    "revision",
+    "head_sha",
+    "validator",
+    "independent_context",
+    "verdict",
+    "criteria",
+    "findings",
+    "disagreements",
+    "only_verifiable_on_hardware"
+  ],
+  "additionalProperties": false
+}

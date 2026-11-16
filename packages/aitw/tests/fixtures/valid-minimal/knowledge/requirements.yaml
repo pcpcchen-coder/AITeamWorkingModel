@@ -1,0 +1,3 @@
+# 虛構測試資料（fictional test data）
+requirements:
+  - {id: REQ-001, text: 虛構需求：換算函式在量程內回傳正確值, domain: sw}

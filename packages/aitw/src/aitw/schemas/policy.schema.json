@@ -1,0 +1,323 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/policy.schema.json",
+  "title": "Path policy and approval rules (.aiteam/policy.yaml)",
+  "x-doc": "docs/11 §5; kit/templates/policy.yaml",
+  "type": "object",
+  "properties": {
+    "policy_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "gates": {
+      "type": "object",
+      "properties": {
+        "G0": {
+          "type": "object",
+          "properties": {
+            "approvals": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "roles_any": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "roles_all": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "review_tier": {
+              "enum": [
+                "R1",
+                "R2",
+                "R3"
+              ]
+            },
+            "batch": {
+              "type": "boolean"
+            },
+            "coread": {
+              "type": "object"
+            },
+            "checklist_required": {
+              "type": "boolean"
+            },
+            "start_approval": {
+              "enum": [
+                "required",
+                "not_required"
+              ]
+            }
+          },
+          "required": [
+            "approvals",
+            "review_tier"
+          ],
+          "additionalProperties": false
+        },
+        "G1": {
+          "type": "object",
+          "properties": {
+            "approvals": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "roles_any": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "roles_all": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "review_tier": {
+              "enum": [
+                "R1",
+                "R2",
+                "R3"
+              ]
+            },
+            "batch": {
+              "type": "boolean"
+            },
+            "coread": {
+              "type": "object"
+            },
+            "checklist_required": {
+              "type": "boolean"
+            },
+            "start_approval": {
+              "enum": [
+                "required",
+                "not_required"
+              ]
+            }
+          },
+          "required": [
+            "approvals",
+            "review_tier"
+          ],
+          "additionalProperties": false
+        },
+        "G2": {
+          "type": "object",
+          "properties": {
+            "approvals": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "roles_any": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "roles_all": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "review_tier": {
+              "enum": [
+                "R1",
+                "R2",
+                "R3"
+              ]
+            },
+            "batch": {
+              "type": "boolean"
+            },
+            "coread": {
+              "type": "object"
+            },
+            "checklist_required": {
+              "type": "boolean"
+            },
+            "start_approval": {
+              "enum": [
+                "required",
+                "not_required"
+              ]
+            }
+          },
+          "required": [
+            "approvals",
+            "review_tier"
+          ],
+          "additionalProperties": false
+        },
+        "G3": {
+          "type": "object",
+          "properties": {
+            "approvals": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "roles_any": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "roles_all": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "review_tier": {
+              "enum": [
+                "R1",
+                "R2",
+                "R3"
+              ]
+            },
+            "batch": {
+              "type": "boolean"
+            },
+            "coread": {
+              "type": "object"
+            },
+            "checklist_required": {
+              "type": "boolean"
+            },
+            "start_approval": {
+              "enum": [
+                "required",
+                "not_required"
+              ]
+            }
+          },
+          "required": [
+            "approvals",
+            "review_tier"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "G0",
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "additionalProperties": false
+    },
+    "paths": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "match": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "enum": [
+              "sw",
+              "fw",
+              "hw",
+              "sys",
+              "research"
+            ]
+          },
+          "min_gate": {
+            "enum": [
+              "G0",
+              "G1",
+              "G2",
+              "G3"
+            ]
+          },
+          "safety_critical": {
+            "type": "boolean"
+          },
+          "checklist": {
+            "type": "string",
+            "minLength": 1
+          },
+          "cross_domain": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "sw",
+                "fw",
+                "hw",
+                "sys",
+                "research"
+              ]
+            }
+          },
+          "extra_approver_role": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "human_only": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "match"
+        ],
+        "additionalProperties": false,
+        "anyOf": [
+          {
+            "required": [
+              "min_gate"
+            ]
+          },
+          {
+            "properties": {
+              "human_only": {
+                "const": true
+              }
+            },
+            "required": [
+              "human_only"
+            ]
+          }
+        ]
+      }
+    },
+    "must_read": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "safety_critical_paths",
+          "interface_changes",
+          "tests_removed_or_skipped",
+          "acceptance_changes",
+          "validator_disagreements",
+          "hypothesis_claims",
+          "human_task_deviations"
+        ]
+      }
+    }
+  },
+  "required": [
+    "policy_version",
+    "gates",
+    "paths",
+    "must_read"
+  ],
+  "additionalProperties": false
+}

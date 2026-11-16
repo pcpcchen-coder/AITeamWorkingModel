@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/evidence-manifest.schema.json",
+  "title": "Evidence manifest (evidence/manifest.yaml)",
+  "x-doc": "docs/11 §4.2",
+  "type": "object",
+  "properties": {
+    "wp": {
+      "type": "string",
+      "pattern": "^WP-\\d{3,}$"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^EV-\\d{3,}-\\d{2,}$"
+          },
+          "ac": {
+            "type": "string",
+            "pattern": "^AC\\d+$"
+          },
+          "kind": {
+            "enum": [
+              "test_run",
+              "build",
+              "static_analysis",
+              "size_report",
+              "sim",
+              "calc",
+              "erc_drc",
+              "bom_check",
+              "datasheet",
+              "measurement",
+              "hil_run",
+              "checklist",
+              "benchmark",
+              "doc"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "produced_by": {
+            "type": "string",
+            "pattern": "^(agent|ci|human):.+$"
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "git_sha": {
+            "type": "string",
+            "minLength": 1
+          },
+          "worktree_dirty": {
+            "type": "boolean"
+          },
+          "started_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "duration_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "env": {
+            "type": "object"
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uri": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "sha256"
+              ],
+              "additionalProperties": false,
+              "anyOf": [
+                {
+                  "required": [
+                    "path"
+                  ]
+                },
+                {
+                  "required": [
+                    "uri"
+                  ]
+                }
+              ]
+            }
+          },
+          "ladder": {
+            "enum": [
+              "V1",
+              "V2",
+              "V3",
+              "V4",
+              "V5"
+            ]
+          },
+          "label": {
+            "enum": [
+              "VERIFIED",
+              "OBSERVED",
+              "HYPOTHESIS",
+              "RECOMMENDATION",
+              "UNKNOWN",
+              "REJECTED"
+            ]
+          },
+          "verified_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(ci|human):.+$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "type": "object"
+          },
+          "value": {
+            "type": "object"
+          },
+          "gap": {
+            "type": "string",
+            "minLength": 1
+          },
+          "conditions": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "ac",
+          "kind",
+          "produced_by",
+          "label"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "test_run",
+                    "build",
+                    "static_analysis",
+                    "size_report",
+                    "sim",
+                    "calc",
+                    "erc_drc",
+                    "bom_check",
+                    "benchmark"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "command",
+                "exit_code",
+                "git_sha",
+                "worktree_dirty",
+                "started_at",
+                "duration_s",
+                "outputs",
+                "ladder"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "measurement",
+                    "hil_run"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "git_sha",
+                "conditions",
+                "outputs",
+                "ladder"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "wp",
+    "items"
+  ],
+  "additionalProperties": false
+}

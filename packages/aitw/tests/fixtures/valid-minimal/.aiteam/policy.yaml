@@ -1,0 +1,11 @@
+# 虛構測試資料（fictional test data）
+policy_version: 1
+gates:
+  G0: {approvals: 1, roles_any: [primary, backup], review_tier: R1}
+  G1: {approvals: 1, roles_any: [primary], review_tier: R2}
+  G2: {approvals: 1, roles_all: [primary], review_tier: R2}
+  G3: {approvals: 2, roles_all: [primary], roles_any: [reviewer], review_tier: R3, checklist_required: true}
+paths:
+  - {match: "sw/**", domain: sw, min_gate: G1}
+  - {match: ".aiteam/**", human_only: true}
+must_read: [tests_removed_or_skipped, acceptance_changes, hypothesis_claims]

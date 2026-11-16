@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/requirements.schema.json",
+  "title": "Requirements (knowledge/requirements.yaml)",
+  "x-doc": "docs/10 §6; docs/11 §3",
+  "type": "object",
+  "properties": {
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*-\\d+$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "enum": [
+              "sw",
+              "fw",
+              "hw",
+              "sys",
+              "research"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "requirements"
+  ],
+  "additionalProperties": false
+}

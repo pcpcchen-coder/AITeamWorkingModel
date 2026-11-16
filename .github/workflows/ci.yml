@@ -1,0 +1,41 @@
+# 本 repo 自身的 CI（WP-001 AC7；人類專屬路徑，見 Plan DR-P2）。
+# 安全設計（docs/11 §9.2、§11）：只用 pull_request（不用 pull_request_target）、
+# 權杖唯讀、不使用任何 secret、限時。
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: lint + pytest (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install aitw (editable) with dev tools
+        run: python -m pip install -e "packages/aitw[dev]"
+      - name: Code lint (ruff)
+        run: ruff check --config packages/aitw/pyproject.toml packages/aitw
+      - name: Unit tests (pytest, offline)
+        run: python -m pytest
+      - name: aitw lint on test fixture
+        run: aitw --repo packages/aitw/tests/fixtures/valid-minimal lint

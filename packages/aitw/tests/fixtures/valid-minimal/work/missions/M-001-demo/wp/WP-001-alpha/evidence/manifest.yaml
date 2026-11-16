@@ -1,0 +1,18 @@
+# 虛構測試資料（fictional test data）
+wp: WP-001
+items:
+  - id: EV-001-01
+    ac: AC1
+    kind: test_run
+    produced_by: "agent:engineer-sw"
+    command: "python -m pytest sw/convert"
+    exit_code: 0
+    git_sha: "0000000000000000000000000000000000000001"
+    worktree_dirty: false
+    started_at: "2026-01-01T00:00:00Z"
+    duration_s: 1.5
+    outputs:
+      - {path: "evidence/EV-001-01.log", sha256: "0000000000000000000000000000000000000000000000000000000000000000"}
+    ladder: V2
+    label: OBSERVED
+    verified_by: null
