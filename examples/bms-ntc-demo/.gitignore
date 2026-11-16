@@ -1,0 +1,3 @@
+# 虛構範例專案（fictional）的產生檔
+__pycache__/
+.pytest_cache/
