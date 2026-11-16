@@ -58,6 +58,8 @@ Human Backup ── challenges / takeover┘             │
 | [16 多人協作設計](docs/16-team-collaboration.md) | **v0.5（主軸）** 多位成員與 AI 的分工、並行協調、誰審誰、指示衝突、人的成長、責任與接受度 |
 | [17 十三站操作細則](docs/17-station-guide.md) | **v0.6** 示範頁 13 站逐站展開：人做什麼、對 AI 說什麼（可直接使用的 prompt 範例）、AI 交回什麼、人要確認什麼 |
 | [交付 AI 的 Prompt](prompts/handoff-prompts.md) | **v0.6** 交付七要素與好壞對照、寫進 `AGENTS.md` 的常駐規則、回報格式、出狀況與多人情境的 prompt |
+| [18 軟韌硬專屬交付範例](docs/18-domain-handoffs.md) | **v0.7** 三個領域各自的補充規則與三個典型任務的交付範例；跨領域介面變更的交付 |
+| [19 哪些介入點需要獨立 Agent](docs/19-agent-roles.md) | **v0.7** 四個 Agent（執行者、驗證者、共讀助理、節奏助理）的判斷依據與建置規格 |
 | [Kit 樣板與檢查表](kit/README.md) | 現在就能用的手動模式樣板；含角色矩陣與團隊協作約定 |
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
