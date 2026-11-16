@@ -60,6 +60,7 @@ Human Backup ── challenges / takeover┘             │
 | [交付 AI 的 Prompt](prompts/handoff-prompts.md) | **v0.6** 交付七要素與好壞對照、寫進 `AGENTS.md` 的常駐規則、回報格式、出狀況與多人情境的 prompt |
 | [18 軟韌硬專屬交付範例](docs/18-domain-handoffs.md) | **v0.7** 三個領域各自的補充規則與三個典型任務的交付範例；跨領域介面變更的交付 |
 | [19 哪些介入點需要獨立 Agent](docs/19-agent-roles.md) | **v0.7** 四個 Agent（執行者、驗證者、共讀助理、節奏助理）的判斷依據與建置規格 |
+| [四個協作 Agent（Claude Code）](kit/agent/claude-code/README.md) | **v0.1** 依 19 建置的執行者、驗證者、共讀助理、節奏助理與 21 個技能；安裝步驟、叫用方式、「靠自律、未被工具強制」清單、虛構示範的試跑紀錄 |
 | [Kit 樣板與檢查表](kit/README.md) | 現在就能用的手動模式樣板；含角色矩陣與團隊協作約定 |
 | [Agent 工作契約](prompts/agent-contracts.md) | Orchestrator / Research / Engineer / Validator / Handover |
 | [協作規範](AGENTS.md) | 對人類與 Coding Agent 的共同規範 |
