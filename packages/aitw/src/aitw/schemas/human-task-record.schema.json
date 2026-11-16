@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/human-task-record.schema.json",
+  "title": "Human task record (front matter)",
+  "x-doc": "docs/10 §8; kit/templates/human-task-record.md",
+  "type": "object",
+  "properties": {
+    "wp": {
+      "type": "string",
+      "pattern": "^WP-\\d{3,}$"
+    },
+    "kind": {
+      "enum": [
+        "measurement",
+        "hil_run",
+        "rework",
+        "bring_up",
+        "procurement",
+        "release"
+      ]
+    },
+    "status": {
+      "enum": [
+        "PREPARED",
+        "APPROVED",
+        "EXECUTED",
+        "ANALYZED",
+        "SIGNED"
+      ]
+    },
+    "prepared_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "start_approval": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^DR-\\d{3,}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "executor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "executed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "signed_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "wp",
+    "kind",
+    "status",
+    "prepared_by",
+    "start_approval",
+    "executor",
+    "executed_at",
+    "signed_by"
+  ],
+  "additionalProperties": false
+}

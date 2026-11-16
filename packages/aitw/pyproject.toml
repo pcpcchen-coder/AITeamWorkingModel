@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aitw"
+version = "0.0.1"
+description = "Git-native Operating Kit CLI: deterministic checks for AI-driven R&D work packages (no model calls)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "See repository" }
+# 執行期相依刻意保持最少（docs/13 §1.3、AGENTS.md 規則 9）：
+#   PyYAML     — YAML 解析（以自訂 SafeLoader 關閉日期轉型、限制布林、拒絕重複鍵）
+#   jsonschema — JSON Schema（Draft 2020-12）驗證，錯誤路徑用於產生「檔案、欄位、原因、修正」訊息
+# 指令列使用標準函式庫 argparse；路徑樣式與 front matter 解析以標準函式庫實作。
+dependencies = [
+  "PyYAML>=6.0",
+  "jsonschema>=4.18",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+aitw = "aitw.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+aitw = ["schemas/*.json"]
+
+[tool.ruff]
+line-length = 125  # CJK 字元以寬度 2 計算；中文訊息需較寬
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["aitw", "conftest"]

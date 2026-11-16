@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/wp.schema.json",
+  "title": "Work package (wp.md front matter)",
+  "x-doc": "docs/11 §4.1",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^WP-\\d{3,}$"
+    },
+    "mission": {
+      "type": "string",
+      "pattern": "^M-\\d{3,}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "enum": [
+        "sw",
+        "fw",
+        "hw",
+        "sys",
+        "research"
+      ]
+    },
+    "executor": {
+      "enum": [
+        "ai",
+        "human",
+        "pair"
+      ]
+    },
+    "agent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "autonomy": {
+      "enum": [
+        "A0",
+        "A1",
+        "A2",
+        "A3"
+      ]
+    },
+    "gate": {
+      "enum": [
+        "G0",
+        "G1",
+        "G2",
+        "G3"
+      ]
+    },
+    "review_tier": {
+      "enum": [
+        "R1",
+        "R2",
+        "R3"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "paths"
+      ],
+      "additionalProperties": false
+    },
+    "satisfies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^WP-\\d{3,}$"
+      }
+    },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^AC\\d+$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verify": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "test_run",
+                  "build",
+                  "static_analysis",
+                  "size_report",
+                  "sim",
+                  "calc",
+                  "erc_drc",
+                  "bom_check",
+                  "datasheet",
+                  "measurement",
+                  "hil_run",
+                  "checklist",
+                  "benchmark",
+                  "doc"
+                ]
+              },
+              "runner": {
+                "enum": [
+                  "ci",
+                  "agent",
+                  "human"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ladder": {
+                "enum": [
+                  "V1",
+                  "V2",
+                  "V3",
+                  "V4",
+                  "V5"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "runner",
+              "ladder"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "runner": {
+                      "enum": [
+                        "ci",
+                        "agent"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "runner"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "command"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "verify"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_agent_minutes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "max_iterations",
+        "max_agent_minutes"
+      ],
+      "additionalProperties": false
+    },
+    "start_approval": {
+      "enum": [
+        "not_required",
+        "required"
+      ]
+    },
+    "blocked": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "reason",
+        "next_action",
+        "owner"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "id",
+    "mission",
+    "title",
+    "domain",
+    "executor",
+    "autonomy",
+    "gate",
+    "review_tier",
+    "scope",
+    "satisfies",
+    "depends_on",
+    "acceptance",
+    "budget",
+    "start_approval"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "executor": {
+            "enum": [
+              "ai",
+              "pair"
+            ]
+          }
+        },
+        "required": [
+          "executor"
+        ]
+      },
+      "then": {
+        "required": [
+          "agent"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gate": {
+            "const": "G3"
+          }
+        },
+        "required": [
+          "gate"
+        ]
+      },
+      "then": {
+        "properties": {
+          "start_approval": {
+            "const": "required"
+          }
+        }
+      }
+    }
+  ]
+}

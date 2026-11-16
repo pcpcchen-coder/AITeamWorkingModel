@@ -1,0 +1,13 @@
+# 虛構測試資料（fictional test data）
+project: fixture-valid-minimal
+forge: none
+default_branch: main
+people:
+  - {handle: primary-a, roles: [primary], domains: [sw]}
+  - {handle: backup-b, roles: [backup], domains: [sw]}
+agents:
+  identities: [aiteam-bot]
+wip:
+  max_in_review_per_person: 3
+  max_open_decisions: 5
+  max_rework: 3

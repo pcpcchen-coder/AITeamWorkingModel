@@ -43,7 +43,7 @@
 | # | 組件 | 交付形式 | 位置（本 repo） |
 |---|---|---|---|
 | ① | `aitw` CLI | Python 套件 | `packages/aitw/` |
-| ② | 檔案契約 | JSON Schema + 樣板 | `packages/aitw/schemas/`、`kit/templates/` |
+| ② | 檔案契約 | JSON Schema + 樣板 | `packages/aitw/src/aitw/schemas/`（隨套件發佈）、`kit/templates/` |
 | ③ | 領域包 | YAML + Markdown | `kit/packs/{sw,fw,hw}/`、`kit/checklists/` |
 | ④ | Agent 整合包 | 技能、子代理、hook 設定 | `kit/agent/claude-code/` |
 | ⑤ | Forge 整合包 | CI 範本、PR／MR 樣板、設定指南 | `kit/forge/github/`、`kit/forge/gitlab/` |
@@ -108,7 +108,17 @@
 
 ### 4.2 `evidence/manifest.yaml`
 
-每筆證據（必須）：`id`、`ac`（對應驗收條件）、`kind`、`produced_by`（`agent:<role>｜ci:<run-id>｜human:<handle>`）、`git_sha`、`worktree_dirty`、`started_at`、`duration_s`、`command` 與 `exit_code`（若為指令）、`outputs[]`（`path` 或 `uri` + `sha256`）、`ladder`、`label`、`verified_by`、`conditions`（量測／HIL 必填，欄位見 10 §4、§5）。
+欄位：`id`、`ac`（對應驗收條件）、`kind`、`produced_by`（`agent:<role>｜ci:<run-id>｜human:<handle>`）、`git_sha`、`worktree_dirty`、`started_at`、`duration_s`、`command` 與 `exit_code`、`outputs[]`（`path` 或 `uri` + `sha256`）、`ladder`、`label`、`verified_by`、`conditions`（欄位見 10 §4、§5）。
+
+必填依 `kind` 而定（schema 強制；Plan 決策 DR-P3）：
+
+| `kind` | 必填 |
+|---|---|
+| 全部 | `id`、`ac`、`kind`、`produced_by`、`label` |
+| 指令類：`test_run｜build｜static_analysis｜size_report｜sim｜calc｜erc_drc｜bom_check｜benchmark` | 另加 `command`、`exit_code`、`git_sha`、`worktree_dirty`、`started_at`、`duration_s`、`outputs`、`ladder` |
+| `measurement｜hil_run` | 另加 `git_sha`、`conditions`、`outputs`、`ladder`（`conditions` 的完整性由 L4 檢查） |
+| `datasheet` | 來源欄位由 L5 檢查（文件名、版次、頁碼） |
+| `checklist｜doc` | 僅共同欄位 |
 
 `kind` 列舉：`test_run｜build｜static_analysis｜size_report｜sim｜calc｜erc_drc｜bom_check｜datasheet｜measurement｜hil_run｜checklist｜benchmark｜doc`。
 
@@ -138,6 +148,10 @@ Front matter（機器欄位）：`wp`、`revision`、`head_sha`、`effective_gat
 ### 4.5 其他
 
 `mission.md`（目標、成功定義、不做什麼、風險邊界、預算、核准者）、`human-task-record.md`（10 §8）、`config.yaml`、`policy.yaml`、週摘要、會議議程、接手包：見樣板。
+
+- `human-task-record.md` 放在該 WP 目錄下（`…/wp/WP-005-<slug>/human-task-record.md`）。
+- `knowledge/requirements.yaml`：`requirements: [{id, text, domain?}]`，`id` 形如 `REQ-001`。WP 的 `satisfies` 引用此處的編號；專案沒有此檔時，可引用所屬 Mission 的 `success` 編號（Plan 決策 DR-P14）。
+- 各檔案的完整欄位定義以 `packages/aitw/src/aitw/schemas/*.schema.json` 為準；`aitw lint` 依此驗證。樣板中的 `<…>` 佔位字由 lint 另行檢查（不套用於 `kit/templates/` 本身）。
 
 ## 5. Policy 與 Gate Check
 

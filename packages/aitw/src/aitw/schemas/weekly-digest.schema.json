@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aitw.invalid/schemas/weekly-digest.schema.json",
+  "title": "Weekly digest (front matter)",
+  "x-doc": "kit/templates/weekly-digest.md",
+  "type": "object",
+  "properties": {
+    "week": {
+      "type": "string",
+      "pattern": "^\\d{4}-W\\d{2}$"
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "for_role": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "generated_from_sha": {
+      "type": "string",
+      "minLength": 1
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 5
+    },
+    "challenge_question": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "week",
+    "project",
+    "for_role",
+    "generated_from_sha",
+    "items",
+    "challenge_question"
+  ],
+  "additionalProperties": false
+}
