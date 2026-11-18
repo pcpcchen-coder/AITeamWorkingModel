@@ -3,7 +3,7 @@
 **文件狀態：** 設計決定與建置規格 v0.7 · 2026-11-17
 **回答的問題：** 十三站裡 AI 介入的地方很多，需要每一個都做成獨立的 Agent 嗎？
 **結論：** 不需要每個介入點一個。需要的是**四個**獨立 Agent，其餘是掛在它們底下的技能（可重複使用的 prompt）。關卡檢查不應該是 Agent。
-**狀態：** Agent 尚未建立；本文是建置規格。Agent 定義檔的格式以所用工具的官方文件為準。
+**狀態：** 四個 Agent 與 21 個技能已依本規格建立（Claude Code），見 [`kit/agent/claude-code/`](../kit/agent/claude-code/README.md)；每個 Agent 只在虛構的小例子上試跑過一次，尚未在真實專案上試用。本文保留為規格與設計依據。
 **誠實聲明：** 這是設計判斷，未經試用。四個的切法可能需要依實際使用調整。
 **互動示範：** [`demo/workflow-walkthrough.html`](../demo/workflow-walkthrough.html) 的每一站標示了負責的 Agent；「四個 Agent，各管各的」可逐一查看立場、權限與絕不做的事。
 
