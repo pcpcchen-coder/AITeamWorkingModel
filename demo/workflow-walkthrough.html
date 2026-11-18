@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<!-- 離線可用的虛構流程示範。內容與 docs/12、docs/16、docs/17 對應；不連接任何真實系統、模型或設備。 -->
+<!-- 離線可用的虛構流程示範。內容與 docs/12、docs/16–19 對應；不連接任何真實系統、模型或設備。 -->
 </head>
 <body>
 <title>共讀共推流程示範</title>
@@ -197,7 +197,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   <header class="head">
     <div>
       <h1>共讀共推流程示範</h1>
-      <p class="lede">AI 執行開發，人類在平台上共同審查並推進進度。按「下一步」跟著一個橫跨軟體、韌體、硬體的案例走完一輪；在標示可操作的站點，你可以自己做決定。每一站都附上可以直接交給 AI 的話，以及人要確認的事；往下還有多人協作的三個小工具。</p>
+      <p class="lede">AI 執行開發，人類在平台上共同審查並推進進度。按「下一步」跟著一個橫跨軟體、韌體、硬體的案例走完一輪；在標示可操作的站點，你可以自己做決定。每一站都附上可以直接交給 AI 的話、由哪個 Agent 負責，以及人要確認的事。往下還有各領域的交付範例、四個 Agent 的分工，與多人協作的三個小工具。</p>
       <span class="note">示範用虛構案例：專案、人員、數值、指令輸出皆為設計示意，非真實結果；aitw 工具尚未實作</span>
     </div>
     <div>
@@ -223,6 +223,40 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   <section class="stage">
     <article class="panel" id="scene" aria-live="polite"></article>
     <aside class="panel board" id="board" aria-label="看板"></aside>
+  </section>
+
+  <section class="team-head">
+    <h2>把工作交給 AI</h2>
+    <p class="muted">上面每一站的範例是同一個案例。換成你自己的任務時，三個領域各有一定要多講的事；而 AI 的介入可以收斂成四個角色。</p>
+  </section>
+
+  <section class="two" id="handoff">
+    <div class="panel">
+      <h2>各領域怎麼交付</h2>
+      <p class="muted small" style="margin-top:4px">選領域與任務類型，看交付的寫法。這是摘要版；完整範例在 docs/18。</p>
+      <div class="bench-controls">
+        <div class="field"><label>領域</label><div class="toggles" id="dmPick"></div></div>
+        <div class="field"><label>任務類型</label><div class="toggles" id="dmTask"></div></div>
+        <div class="callout" id="dmNote"></div>
+        <div class="say"><div class="cap" style="margin:0">你對 AI 說的話（範例）</div><pre class="prompt" id="dmPrompt"></pre><button type="button" class="btn" data-copy="dmPrompt">複製這段話</button><p class="hint">方括號是要你填的內容。範例未經實測；硬體範例以匯出檔（網表、BOM、PDF）為輸入。</p></div>
+        <div><div class="cap">這個領域審查者最該確認</div><ul class="checks" id="dmChecks"></ul></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>四個 Agent，各管各的</h2>
+      <p class="muted small" style="margin-top:4px">不是每個介入點一個 Agent。只有需要獨立性、權限不同、服務對象不同或觸發方式不同時才拆開。</p>
+      <div class="toggles" id="agPick" style="margin-top:12px"></div>
+      <div id="agOut" style="margin-top:12px;display:flex;flex-direction:column;gap:12px"></div>
+      <div class="sub">
+        <h3>不做成 Agent 的事</h3>
+        <dl class="kv" style="margin-top:8px">
+          <dt>關卡檢查</dt><dd>由確定性的 CI 執行。關卡要每次給出同樣的答案，不能交給會變動的模型判斷。</dd>
+          <dt>決定、核准、合併</dt><dd>人。核准的正本是人在平台上的已驗證行為。</dd>
+          <dt>軟韌硬的差異</dt><dd>用領域規則與交付內容處理，不各立一個 Agent。</dd>
+        </dl>
+        <p class="hint" style="font-size:12.5px;color:var(--muted);margin-top:10px">四個 Agent 正在建立中，尚未可用；切法是設計判斷，需試用後調整。</p>
+      </div>
+    </div>
   </section>
 
   <section class="team-head">
@@ -287,7 +321,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   </section>
 
   <footer class="foot">
-    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）、docs/16（多人協作）、docs/17（十三站操作細則與 prompt 範例）。本頁不連接任何真實系統、模型或設備。
+    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）、docs/16（多人協作）、docs/17（十三站操作細則與 prompt 範例）、docs/18（軟韌硬專屬交付範例）、docs/19（四個 Agent）。本頁不連接任何真實系統、模型或設備。
   </footer>
 </div>
 
@@ -520,7 +554,7 @@ function drawLines(){
 var LANE={h:["h","人類"],a:["a","AI Agent"],c:["c","CI 與 Gate"]}, prevCards={};
 function renderScene(){
   var s=STEPS[cur], tool=typeof s.tool==="function"?s.tool():s.tool;
-  document.getElementById("scene").innerHTML='<div class="step-head"><span class="chip '+LANE[s.lane][0]+'">'+LANE[s.lane][1]+'</span><h2><span class="mono">'+(cur+1)+'</span>　'+s.t+'</h2>'+(s.act?'<span class="pill">可操作</span>':"")+'</div>'
+  document.getElementById("scene").innerHTML='<div class="step-head"><span class="chip '+LANE[s.lane][0]+'">'+LANE[s.lane][1]+'</span><h2><span class="mono">'+(cur+1)+'</span>　'+s.t+'</h2>'+(s.act?'<span class="pill">可操作</span>':"")+'<span class="pill">AI：'+STATION_AGENT[cur]+'</span>'+'</div>'
    +'<p class="story">'+s.story+'</p><p class="toolline">'+esc(s.who)+'　·　<span class="mono">'+esc(tool)+'</span></p><div class="blocks">'+s.body()+extra(cur)+'</div>';
 }
 function renderBoard(){
@@ -620,6 +654,50 @@ function renderLadder(){
 }
 document.getElementById("ladder").addEventListener("click",function(e){var b=e.target.closest("button");if(b){lsel=[+b.dataset.r,+b.dataset.c];renderLadder()}});
 
+/* ---------- handoff: domain examples and the four agents ---------- */
+var STATION_AGENT=["執行者","執行者","驗證者（選用）","執行者","執行者","驗證者＋執行者","共讀助理","Gate 不是 Agent；自查由驗證者（選用）","執行者＋驗證者","共讀助理；返工交給執行者","執行者","執行者","節奏助理"];
+var DOMS=[
+{n:"軟體",note:"交付時一定要講：行為不變的範圍；公開介面能不能動。AI 最容易做錯的是改得比你要的多，以及用例外處理把錯誤蓋掉。",
+ c:["被修改或刪除的測試：理由成立嗎？","有沒有新增的例外處理把問題蓋掉？","有沒有順手改到不相關的地方？"],
+ t:[["新增功能","請執行 [工作包]：上位機解析訊框的故障旗標，並在計算中排除故障期間的資料。\n\n【目的】感測器斷線時韌體會回報故障；那段資料若照常計算，結果會偏掉。\n【範圍】只能改上位機程式與測試。不要改介面契約；訊框格式以它為準。\n【要求】\n- 新增契約測試：介面契約改了而程式沒跟上時，測試要會失敗。\n- 舊版訊框要能照常處理，並寫測試。\n- 排除資料時留下可查的紀錄，不要無聲丟棄。\n- 測試涵蓋：全部正常、部分故障、全部故障、未定義的旗標值。\n【停下來問我】介面契約有歧義；「全部故障時該回傳什麼」規格沒寫；需要新增相依套件。\n【不要做】重構不相關的程式；為了讓舊測試通過而修改舊測試的期望值。"],
+    ["修錯","請處理 [Issue]：低溫時計算結果偶爾出現負值。請依序做，不要跳步。\n\n【第一步：重現】先寫一個會失敗的測試重現問題。重現不出來就停下來告訴我你試了什麼，不要憑猜測修改。\n【第二步：找根因】說明為什麼會出現負值並指出行號。請區分根因與症狀出現的地方。\n【第三步：修正】修根因，改動越小越好。不要用夾到零、空的例外處理或預設值把症狀蓋掉。保留第一步的測試。\n\n另外列出其他可能有同類問題的地方，但先不要改。\n【停下來問我】根因其實在韌體送來的資料；修正會改變其他情況下的輸出。"],
+    ["重構","請執行 [工作包]：把散在三個檔案的換算邏輯抽成單一模組。這是「行為不變」的重構。\n\n1. 動手前先盤點三處實作的差異（四捨五入、邊界、單位）。差異可能是 bug，也可能是有意的；逐一列出來問我要保留哪一種，不要自己統一。\n2. 我決定後，先補上能鎖住現有行為的測試，確認重構前是通過的。\n3. 再重構。重構後同一批測試必須不改一字就通過。\n4. 公開函式的名稱與簽名保持不變；需要改請先問。\n\n【證據】重構前與重構後各執行一次完整測試，兩次的輸出都留存。"]]},
+{n:"韌體",note:"交付時一定要講：不碰實機；哪些只能在實機確認；數值由誰決定。AI 最容易做錯的是把主機端測試通過當成實機可用。",
+ c:["每個常數與門檻都有來源（抽查頁碼）","共讀包有「只能在實機確認的項目」與對應的人類任務","沒有把主機端結果寫成實機結論"],
+ t:[["數值處理","請執行 [工作包]：為溫度取樣加上一階低通濾波器（定點數實作）。\n\n【目的】實機量測顯示讀值有雜訊。要在不引入浮點運算的前提下降低雜訊，並清楚知道濾波帶來的延遲。\n【要求】\n- 濾波係數做成參數；預設值不要自己選，列出候選值與各自的延遲、抑制效果，開決策請求。\n- 說明資料型別與每個中間值的範圍，證明不會溢位；測試包含最大、最小、劇烈跳變、長時間固定輸入。\n- 感測器故障期間濾波器怎麼處理，規格沒寫：列選項問我。\n- 提供 Flash／RAM 用量與上一版的差異。\n【只能在實機確認的項目】請列出來，並起草給人執行的量測工作包。不要用主機端的合成雜訊下「雜訊已改善」的結論。"],
+    ["驅動與時序","請執行 [工作包]：取樣由主迴圈輪詢改為定時器觸發，轉換完成後以中斷讀取。\n\n【先讀清楚這個任務的限制】這類變更的正確性最終只能在實機確認。你能做的是程式、主機端可測的邏輯，以及讓人能有效驗證的計畫。請不要宣稱時序正確。\n【要求】\n- 每個暫存器設定值註明依據（參考手冊的文件名、版次、頁碼）。無法查證的標 UNKNOWN，不要憑印象填。\n- 把硬體相依的薄層與可在主機端測試的邏輯分開。\n- 列出中斷與主程式共用的資料，以及各自的保護方式。\n【交付給人的部分】起草量測取樣週期與抖動的程序書，包含量測點、預期範圍、中止條件。你不操作任何設備。\n【完成後】凡涉及時序的主張一律標 HYPOTHESIS，並指向對應的量測工作包。"],
+    ["安全關鍵","請執行 [工作包]：過溫保護加入遲滯，避免在門檻附近反覆跳動。\n\n這是安全關鍵變更，會由合格審查者逐行審查。請把程式寫得容易審，而不是寫得精巧。\n\n【要求】\n- 門檻值只使用決策紀錄給的數值，並在程式中註明來源。你不可以調整數值；認為數值有問題就停下來問。\n- 定義並測試每一種狀態轉換：正常到保護、保護到解除、開機時已超過門檻、感測器故障時。\n- 無法確認溫度時應視為不安全；現有設計若不是如此，停下來問。\n- 不要修改或刪除現有的保護測試；需要調整的逐一列出並說明。\n【完成後】逐項填寫安全審查檢查表，每項寫結果與依據，不可只打勾；你無法判定的寫「需人確認」。"]]},
+{n:"硬體",note:"交付時一定要講：你只提建議與檢查，由人定案；每個數值要有頁碼。AI 最容易做錯的是把推論寫成設計，以及規格書數值記錯或編造。",
+ c:["抽查規格書引用：頁碼對得上、條件一致、沒有外推","UNKNOWN 有被處理，不是被忽略","只有模擬支持的結論，沒有被寫成已驗證"],
+ t:[["元件選型研究","請執行 [工作包]：為停產的熱敏電阻研究替代料，提出比較與建議。你提供資料與建議，選哪一顆由人決定。\n\n【資料來源】只用我放在候選資料夾的三份規格書與現用料的規格書。不要引用你記憶中的其他料號或數值。\n【要求】\n- 每個數值附文件名、版次、頁碼、適用條件；規格書沒寫的填 UNKNOWN。\n- 不要外推：表格沒涵蓋的溫度就寫「表格未涵蓋」；以公式估算的另外標示為估算。\n- 用既有的計算腳本，以各候選料的參數重跑最壞情況誤差。\n- 列出換料對韌體查表、封裝、介面契約的影響。\n- 供應狀況、生命週期、價格你無法查證，列為「需人確認」，不要推測。\n【完成後】比較表、建議與理由、所有 UNKNOWN 與假設清單；開決策請求讓我們選。"],
+    ["圖面與 BOM 檢查","硬體負責人已完成電路圖變更。請你當第一輪檢查者。你不修改任何圖面或 BOM；只提出發現，由人判斷。\n\n【輸入】這次與上一版的匯出檔：網表、BOM、電路圖 PDF；變更說明；介面契約。\n【請檢查】\n1. 網表差異與變更說明是否一致？有沒有說明沒提到的差異？\n2. BOM 的值、封裝、料號變更，有沒有與圖面不一致。\n3. 腳位、上拉值、參考電壓是否與介面契約相符。\n4. 新增元件的耐壓、功率、溫度降額；沒有規格書的寫 UNKNOWN。\n5. 對共用同一節點或電源軌的其他電路的影響；韌體哪些常數要跟著改。\n【每項發現】位置、看到什麼、為什麼可能是問題、依據、你的把握（高／中／低）。\n【你做不到的事請直接說】佈局、走線、電磁相容、散熱，無法從這些匯出檔可靠判斷。\n你的檢查不構成核准。"],
+    ["首次上電程序書","請為改版樣板準備首次上電的程序書與紀錄表。執行者是合格人員；你不操作任何設備。這份程序會經合格人員審閱後才啟用，並以實驗室安全 SOP 為準。\n\n【程序必須包含】\n- 上電前的目視與靜態檢查：看什麼、量哪些點、預期範圍。\n- 限流供電的分段步驟：每段的電壓與限流設定、要量的測試點。\n- 每個量測點的預期值與依據（電路圖頁碼、規格書頁碼）。沒有依據的寫「待執行者確認」，不要填一個數字。\n- 明確的中止條件：電流、電壓超出範圍，或任何發熱、異味，立即斷電並記錄。\n- 要記錄的欄位，包含儀器校正編號與環境條件。\n【要求】一步一個動作；你做的假設集中列在最前面；涉及高電壓、大電流或電池的部分標明「依實驗室安全 SOP 執行」。\n【完成後】開啟動核准的決策請求（需兩人核准），並列出你最不確定的三個預期值。"]]}
+];
+var AGS=[
+ {n:"執行者",id:"mission-executor",who:"任務主責",does:"訪談與起草目標、拆工作包、執行並留證、寫共讀包、返工、準備人類任務的程序書、分析人填的紀錄",write:"工作包範圍內的檔案與該任務的工作目錄",never:"核准、合併、改驗收條件、碰設備、修改人填的紀錄",why:"基準角色。規劃與執行留在同一個 Agent，因為執行時需要規劃時的脈絡。",st:"第 1、2、4、5、9、10、11、12 站"},
+ {n:"驗證者",id:"independent-validator",who:"審查流程（不為作者）",does:"在乾淨環境重跑驗收、核對主張與證據、找驗收條件沒涵蓋的風險；用同樣的獨立立場挑計畫的毛病",write:"只有驗證報告",never:"修改產品程式或測試、替作者補救、給出「核准」",why:"需要獨立性與不同權限：同一個對話既寫又驗，等於自己改自己的考卷。",st:"第 3、6、8、9 站"},
+ {n:"共讀助理",id:"coread-guide",who:"個別審查者",does:"依必看清單帶讀、回答問題並附來源、出挑戰題、比對見習審查、當學習型工作包的助教",write:"不寫入 repo；只產生留言草稿給人",never:"替人按核准、修改分支、替人送出留言",why:"服務對象不同：它是審查者自己的助理，不是任務主責的。",st:"第 7、10 站"},
+ {n:"節奏助理",id:"cadence-reporter",who:"整個團隊",does:"每日簡報、備援週摘要、每週會議議程、每月案例回顧的材料",write:"只有摘要、議程、紀錄這類檔案",never:"評價個人、判斷責任歸屬、編造進度",why:"觸發方式不同：照排程自己跑，不需要單一任務的脈絡。",st:"第 13 站，以及每日、每週、每月的節奏"}];
+var dm=1, dt=0, ag=1;
+function renderDom(){
+  pick(document.getElementById("dmPick"),DOMS.map(function(d){return [d.n]}),dm);
+  var D=DOMS[dm]; pick(document.getElementById("dmTask"),D.t,dt);
+  document.getElementById("dmNote").textContent=D.note;
+  document.getElementById("dmPrompt").textContent=D.t[dt][1];
+  document.getElementById("dmChecks").innerHTML=D.c.map(function(t){return '<li>'+esc(t)+'</li>'}).join("")}
+function renderAg(){
+  pick(document.getElementById("agPick"),AGS.map(function(a){return [a.n]}),ag); var a=AGS[ag];
+  document.getElementById("agOut").innerHTML='<dl class="kv"><dt>名稱</dt><dd><span class="mono">'+a.id+'</span></dd><dt>為誰工作</dt><dd>'+a.who+'</dd><dt>做什麼</dt><dd>'+a.does+'</dd><dt>可以寫入</dt><dd>'+a.write+'</dd><dt>出現在</dt><dd>'+a.st+'</dd></dl>'
+   +'<div class="callout warn"><b>絕不做：</b>'+a.never+'</div><div class="callout"><b>為什麼獨立出來：</b>'+a.why+'</div>'}
+document.getElementById("dmPick").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){dm=+b.dataset.i;dt=0;renderDom()}});
+document.getElementById("dmTask").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){dt=+b.dataset.i;renderDom()}});
+document.getElementById("agPick").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){ag=+b.dataset.i;renderAg()}});
+document.getElementById("handoff").addEventListener("click",function(e){
+  var cp=e.target.closest("[data-copy]"); if(!cp)return;
+  var pre=document.getElementById(cp.dataset.copy), done=function(){cp.textContent="已複製";setTimeout(function(){cp.textContent="複製這段話"},1600)},
+      sel=function(){var r=document.createRange();r.selectNodeContents(pre);var s=window.getSelection();s.removeAllRanges();s.addRange(r);cp.textContent="已選取，請按複製"};
+  try{navigator.clipboard.writeText(pre.textContent).then(done,sel)}catch(err){sel()}});
+
 /* ---------- team: who reviews ---------- */
 var PPL=["甲","乙","丙","丁"], LIMIT=3;
 var MIS={A:{n:"M-A 低溫量測準確度",o:"甲",b:"乙"},B:{n:"M-B 上位機資料管線",o:"乙",b:"丙"},C:{n:"M-C 通訊協定改版",o:"丙",b:"丁"}};
@@ -691,7 +769,7 @@ function renderErr(){
 document.getElementById("dsPick").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){ds=+b.dataset.i;renderDisp()}});
 document.getElementById("erPick").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){er=+b.dataset.i;renderErr()}});
 
-buildTrack(); setForge("gitlab"); renderLadder(); renderTeam(); renderDisp(); renderErr();
+buildTrack(); setForge("gitlab"); renderLadder(); renderDom(); renderAg(); renderTeam(); renderDisp(); renderErr();
 window.addEventListener("resize",drawLines);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawLines);
 })();
