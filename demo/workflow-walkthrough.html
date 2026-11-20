@@ -254,7 +254,14 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
           <dt>決定、核准、合併</dt><dd>人。核准的正本是人在平台上的已驗證行為。</dd>
           <dt>軟韌硬的差異</dt><dd>用領域規則與交付內容處理，不各立一個 Agent。</dd>
         </dl>
-        <p class="hint" style="font-size:12.5px;color:var(--muted);margin-top:10px">四個 Agent 正在建立中，尚未可用；切法是設計判斷，需試用後調整。</p>
+        </div>
+      <div class="sub">
+        <h3>安裝與現況</h3>
+        <dl class="kv" style="margin-top:8px">
+          <dt>安裝</dt><dd>把 <span class="mono">kit/agent/claude-code</span> 的 agents 與 skills 複製到專案的 <span class="mono">.claude/</span>，放入樣板，並把常駐規則寫進 <span class="mono">AGENTS.md</span>。GitLab 與 GitHub 作法相同。</dd>
+          <dt>現況</dt><dd>四個 Agent 與 21 個技能已建立（Claude Code）。每個 Agent 只在虛構的小例子上試跑過一次，且用的是同一個模型；尚未在真實專案上試用。</dd>
+          <dt>真正的保證</dt><dd>不可逆的限制（不能合併、不能碰設備）要靠帳號權限與執行環境，不是靠 Agent 的定義。</dd>
+        </dl>
       </div>
     </div>
   </section>
@@ -321,7 +328,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:6px;
   </section>
 
   <footer class="foot">
-    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）、docs/16（多人協作）、docs/17（十三站操作細則與 prompt 範例）、docs/18（軟韌硬專屬交付範例）、docs/19（四個 Agent）。本頁不連接任何真實系統、模型或設備。
+    完整設計見 <a href="https://github.com/pcpcchen-coder/AITeamWorkingModel">AITeamWorkingModel</a> 的 docs/09（流程）、docs/10（軟韌硬領域規範）、docs/11（工具規格）、docs/12（操作範例）、docs/14（GitLab 執行方式）、docs/16（多人協作）、docs/17（十三站操作細則與 prompt 範例）、docs/18（軟韌硬專屬交付範例）、docs/19（四個 Agent；定義檔與安裝說明在 kit/agent/claude-code）。本頁不連接任何真實系統、模型或設備。
   </footer>
 </div>
 
@@ -530,7 +537,7 @@ var EXTRA=[
 ];
 function fill(t){return t.split("{MR}").join(f().mr)}
 function extra(i){var x=EXTRA[i]; if(!x)return "";
-  return '<details class="say" open><summary>'+(x.opt?"選用　":"")+'你對 AI 說的話（範例）</summary><pre class="prompt" id="prompt'+i+'">'+esc(fill(x.p))+'</pre><button type="button" class="btn" data-copy="prompt'+i+'">複製這段話</button><p class="hint">可直接貼給任一 Coding Agent。示範頁上的指令工具尚未實作，這段白話文字現在就能用；範例未經實測，請依實際效果調整。</p></details>'
+  return '<details class="say" open><summary>'+(x.opt?"選用　":"")+'你對 AI 說的話（範例）</summary><pre class="prompt" id="prompt'+i+'">'+esc(fill(x.p))+'</pre><button type="button" class="btn" data-copy="prompt'+i+'">複製這段話</button><p class="hint">可直接貼給任一 Coding Agent。已安裝四個 Agent 的專案，可改用標題旁標示的技能指令，再補上這次特有的內容。上方的 aitw 指令列工具仍未實作；範例未經真實專案實測。</p></details>'
    +'<div><div class="cap">這一站人要確認</div><ul class="checks">'+x.c.map(function(t){return '<li>'+esc(fill(t))+'</li>'}).join("")+'</ul></div>'}
 
 /* ---------- track ---------- */
@@ -655,7 +662,12 @@ function renderLadder(){
 document.getElementById("ladder").addEventListener("click",function(e){var b=e.target.closest("button");if(b){lsel=[+b.dataset.r,+b.dataset.c];renderLadder()}});
 
 /* ---------- handoff: domain examples and the four agents ---------- */
-var STATION_AGENT=["執行者","執行者","驗證者（選用）","執行者","執行者","驗證者＋執行者","共讀助理","Gate 不是 Agent；自查由驗證者（選用）","執行者＋驗證者","共讀助理；返工交給執行者","執行者","執行者","節奏助理"];
+var STATION_AGENT=["執行者 /mission-intake","執行者 /wp-plan","驗證者 /critique-plan（選用）","執行者 /wp-run","執行者 /decision-request","驗證者 /verify-wp；執行者 /review-packet","共讀助理 /coread","Gate 不是 Agent；自查 /premerge-check（選用）","執行者 /wp-run；驗證者 /verify-wp","共讀助理 /coread；返工 /rework","執行者 /decision-request、/rework","執行者 /human-task","節奏助理 /sync-agenda"];
+var AGX=[
+ {tools:"讀取、搜尋、編輯、寫入、執行指令",skills:"mission-intake、wp-plan、wp-run、decision-request、review-packet、rework、human-task、takeover-pack；領域技能 domain-sw、domain-fw、domain-hw",call:"claude --agent mission-executor，再輸入技能，例如 /wp-run WP-003 加上目的與特有要求",self:"只改工作包範圍內的檔案、不合併、不碰設備，都只寫在說明文字裡，工具擋不住。"},
+ {tools:"讀取、搜尋、執行指令、寫入（沒有編輯工具）",skills:"verify-wp、critique-plan、premerge-check",call:"在任何對話輸入 /verify-wp WP-003：會另開一個驗證者執行，不帶原對話的脈絡",self:"只寫驗證報告、不改產品程式與測試，靠自律；要用不同的模型需要人設定。"},
+ {tools:"只有讀取與搜尋（不能寫檔、不能執行指令）",skills:"coread、shadow-compare、tutor",call:"claude --agent coread-guide，再輸入 /coread WP-003",self:"不寫入 repo 由工具強制。不先給答案、不淡化漏看是內容層面，靠自律。"},
+ {tools:"讀取、搜尋、執行指令、寫入（沒有編輯工具）",skills:"daily-brief、weekly-digest、sync-agenda、case-review",call:"在任何對話輸入 /daily-brief 或 /sync-agenda：會另開節奏助理執行",self:"只寫節奏類檔案、只做唯讀查詢、不評價個人，都靠自律。"}];
 var DOMS=[
 {n:"軟體",note:"交付時一定要講：行為不變的範圍；公開介面能不能動。AI 最容易做錯的是改得比你要的多，以及用例外處理把錯誤蓋掉。",
  c:["被修改或刪除的測試：理由成立嗎？","有沒有新增的例外處理把問題蓋掉？","有沒有順手改到不相關的地方？"],
@@ -687,7 +699,8 @@ function renderDom(){
   document.getElementById("dmChecks").innerHTML=D.c.map(function(t){return '<li>'+esc(t)+'</li>'}).join("")}
 function renderAg(){
   pick(document.getElementById("agPick"),AGS.map(function(a){return [a.n]}),ag); var a=AGS[ag];
-  document.getElementById("agOut").innerHTML='<dl class="kv"><dt>名稱</dt><dd><span class="mono">'+a.id+'</span></dd><dt>為誰工作</dt><dd>'+a.who+'</dd><dt>做什麼</dt><dd>'+a.does+'</dd><dt>可以寫入</dt><dd>'+a.write+'</dd><dt>出現在</dt><dd>'+a.st+'</dd></dl>'
+  document.getElementById("agOut").innerHTML='<dl class="kv"><dt>名稱</dt><dd><span class="mono">'+a.id+'</span></dd><dt>為誰工作</dt><dd>'+a.who+'</dd><dt>做什麼</dt><dd>'+a.does+'</dd><dt>可以寫入</dt><dd>'+a.write+'</dd><dt>出現在</dt><dd>'+a.st+'</dd><dt>工具</dt><dd>'+AGX[ag].tools+'</dd><dt>技能</dt><dd><span class="mono">'+AGX[ag].skills+'</span></dd><dt>怎麼叫用</dt><dd>'+AGX[ag].call+'</dd></dl>'
+   +'<div class="callout"><b>靠自律的部分：</b>'+AGX[ag].self+'</div>'
    +'<div class="callout warn"><b>絕不做：</b>'+a.never+'</div><div class="callout"><b>為什麼獨立出來：</b>'+a.why+'</div>'}
 document.getElementById("dmPick").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){dm=+b.dataset.i;dt=0;renderDom()}});
 document.getElementById("dmTask").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){dt=+b.dataset.i;renderDom()}});
